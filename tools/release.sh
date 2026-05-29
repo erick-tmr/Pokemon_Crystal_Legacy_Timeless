@@ -190,23 +190,15 @@ $DESCRIPTION"
 git push origin "$VERSION"
 
 # -- release notes ----------------------------------------------------------
+# Default body is the rendered patching template (same one bundled in the zip)
+# so visitors of the release page get the full install instructions inline.
+# Override with --notes-file if you want hand-written notes.
 NOTES_PATH="$STAGE/notes.md"
 if [ -n "$NOTES_FILE" ]; then
   [ -f "$NOTES_FILE" ] || { echo "error: notes file not found: $NOTES_FILE" >&2; exit 1; }
   cp "$NOTES_FILE" "$NOTES_PATH"
 else
-  GEN_ARGS=(-f tag_name="$VERSION")
-  if [ "$LATEST" != "v0.0.0" ] \
-     && git rev-parse --verify --quiet "refs/tags/$LATEST" >/dev/null; then
-    GEN_ARGS+=(-f previous_tag_name="$LATEST")
-  fi
-  {
-    printf '%s\n\n' "$DESCRIPTION"
-    gh api --method POST \
-      -H "Accept: application/vnd.github+json" \
-      "/repos/$REPO_FULL/releases/generate-notes" \
-      "${GEN_ARGS[@]}" --jq .body
-  } > "$NOTES_PATH"
+  cp "$ROOT/Patching Instructions/README.md" "$NOTES_PATH"
 fi
 
 # -- create release ---------------------------------------------------------
