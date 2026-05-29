@@ -78,6 +78,31 @@ _TitleScreen:
 	ld a, 1
 	call ByteFill
 
+; 'TIMELESS' bar at screen row 10:
+;   cols 6-11 (TIMELESS letters + clock left border) = palette 1
+;   col 12 (clock tile) = palette 7 (so hand pixels can be opaque black)
+;   col 13 (right border) = palette 1
+	hlbgcoord 6, 10
+	ld bc, 6
+	ld a, 1
+	call ByteFill
+
+	hlbgcoord 12, 10
+	ld bc, 1
+	ld a, 7
+	call ByteFill
+
+	hlbgcoord 13, 10
+	ld bc, 1
+	ld a, 1
+	call ByteFill
+
+; Clock bottom border at screen row 11 col 12 (palette 1, for the red top row)
+	hlbgcoord 12, 11
+	ld bc, 1
+	ld a, 1
+	call ByteFill
+
 ; Suicune gfx
 	hlbgcoord 0, 12
 	ld bc, 6 * BG_MAP_WIDTH ; the rest of the screen
@@ -111,11 +136,25 @@ _TitleScreen:
 	ld e, 20
 	call DrawTitleGraphic
 
-; Draw copyright text
-	hlbgcoord 4, 0, vBGMap1
-	lb bc, 1, 13
+; Draw copyright text (16 tiles wide for "©2026 SPP & ETM V0.3.0", centered)
+	hlbgcoord 2, 0, vBGMap1
+	lb bc, 1, 16
 	ld d, $c
 	ld e, 16
+	call DrawTitleGraphic
+
+; Draw TIMELESS bar at screen row 10 (tile ids $20..$27: 6 TIMELESS + 1 clock + 1 right-border)
+	hlcoord 6, 10
+	lb bc, 1, 8
+	ld d, $20
+	ld e, 20
+	call DrawTitleGraphic
+
+; Draw clock bottom-border tile at screen row 11 col 12 (tile id $28)
+	hlcoord 12, 11
+	lb bc, 1, 1
+	ld d, $28
+	ld e, 20
 	call DrawTitleGraphic
 
 ; Initialize running Suicune?
