@@ -42,9 +42,15 @@ https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless/blob/main/TIMELESS.
 ## After patching: setting the clock
 
 Timeless has **no real-time clock** — time is a value you set and it stays frozen until you
-change it. Set it from **New Game**, or any time after by holding **Down + B** at the **title
-screen** (the one showing Suicune leaping over the water, before the Continue / New Game menu).
-Time-based events advance when you advance the day there. Full guide in `TIMELESS.md`.
+change it. Set it from **New Game**, or any time after using one of these shortcuts:
+
+* **Hold Down + B at the title screen** (the one showing Suicune leaping over the water,
+  before the Continue / New Game menu) — same screen Mr. Pokémon uses to reset the clock.
+* **Hold SELECT + UP on the Pokégear's Clock card** — opens the same clock-setting screen
+  from inside the game, no need to back out to the title.
+
+Time-based events advance when you advance the day from either shortcut. Full guide in
+`TIMELESS.md`.
 
 ## PC Users
 * Recommended emulator: https://mgba.io/downloads.html
