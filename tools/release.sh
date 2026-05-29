@@ -89,6 +89,13 @@ if [ -n "$BRANCH" ] \
   exit 1
 fi
 
+# Derive owner/repo from origin so gh hits this fork rather than its default
+# (which on a clone with an 'upstream' remote can resolve to upstream).
+ORIGIN_URL="$(git remote get-url origin 2>/dev/null || true)"
+REPO_FULL="$(printf '%s' "$ORIGIN_URL" | sed -E 's#^.*github\.com[:/]##; s#\.git$##')"
+[[ "$REPO_FULL" =~ ^[^/]+/[^/]+$ ]] \
+  || { echo "error: could not parse owner/repo from origin URL: $ORIGIN_URL" >&2; exit 1; }
+
 # -- base ROMs ---------------------------------------------------------------
 BASE_DIR=".baseroms"
 BASE_1_0="$BASE_DIR/baserom_usa_1_0.gbc"
@@ -188,7 +195,6 @@ if [ -n "$NOTES_FILE" ]; then
   [ -f "$NOTES_FILE" ] || { echo "error: notes file not found: $NOTES_FILE" >&2; exit 1; }
   cp "$NOTES_FILE" "$NOTES_PATH"
 else
-  REPO_FULL="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
   GEN_ARGS=(-f tag_name="$VERSION")
   if [ "$LATEST" != "v0.0.0" ] \
      && git rev-parse --verify --quiet "refs/tags/$LATEST" >/dev/null; then
@@ -209,6 +215,6 @@ RELEASE_FLAGS=(--title "$VERSION — $DESCRIPTION" --notes-file "$NOTES_PATH")
 [ "$DRAFT"      -eq 1 ] && RELEASE_FLAGS+=(--draft)
 
 echo ">> Creating GitHub release"
-gh release create "$VERSION" "${RELEASE_FLAGS[@]}" "$ZIP_PATH"
+gh release create "$VERSION" -R "$REPO_FULL" "${RELEASE_FLAGS[@]}" "$ZIP_PATH"
 
 echo ">> Done. Release $VERSION created."
