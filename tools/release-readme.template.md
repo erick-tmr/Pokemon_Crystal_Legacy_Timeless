@@ -10,19 +10,7 @@ https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless/blob/main/TIMELESS.
 
 # What's in this release
 
-* **No RTC dependence.** All clock reads/writes are removed; the clock is a frozen software
-  value you set manually. Fixes the Box 8 / save-corruption bug on RTC-less hardware.
-* **MBC5 header** (`$0147` = `0x1b`, RAM + battery, no timer). Save format unchanged —
-  existing `.sav` files work as-is.
-* **Frozen manual clock.** Time-of-day, weekday, and the day counter are set via the in-game
-  clock screen, reachable from **New Game**, by holding **Down + B** at the Suicune title
-  screen, or by holding **SELECT + UP** on the Pokégear's Clock card. Daily events refresh
-  when you advance the day.
-* **Incoming phone calls** re-driven by the play-time counter so they still fire on a frozen
-  clock.
-* **Selected daily freebies made always-available** (weekday/time gates kept): berry trees,
-  Move Tutor, Trainer House, haircut brothers, Buena's Password, Indigo rival rematch,
-  Goldenrod bargain shop.
+{{CHANGES}}
 
 See [TIMELESS.md](https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless/blob/main/TIMELESS.md)
 for the full event-by-event reference.
