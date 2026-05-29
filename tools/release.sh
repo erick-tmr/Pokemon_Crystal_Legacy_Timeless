@@ -14,11 +14,16 @@
 # Usage:
 #   tools/release.sh <patch|minor|major> "<description>" [options]
 #
+# Per-version "What's in this release" bullets are read from
+# release-notes/<version>.md (e.g. release-notes/v0.2.0.md). Keep these
+# user-facing — summarize internal/tooling work as "General improvements".
+#
 # Options:
 #   --prerelease            Mark the GitHub release as pre-release
 #   --draft                 Create as a draft (does not publish)
-#   --notes-file <path>     Use a file as the release body
-#                           (default: description + auto-generated changelog)
+#   --changes-file <path>   Override the default release-notes/<version>.md
+#   --notes-file <path>     Replace the entire rendered body with this file
+#                           (default body: rendered patching template)
 #   --skip-build            Reuse existing pokecrystal*.gbc instead of rebuilding
 #   -h, --help              Show this help
 
@@ -49,6 +54,7 @@ DESCRIPTION="$1"; shift
 PRERELEASE=0
 DRAFT=0
 NOTES_FILE=""
+CHANGES_FILE=""
 SKIP_BUILD=0
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -57,6 +63,9 @@ while [ $# -gt 0 ]; do
     --notes-file)
       [ $# -ge 2 ] || { echo "error: --notes-file needs a path" >&2; exit 2; }
       NOTES_FILE="$2"; shift 2 ;;
+    --changes-file)
+      [ $# -ge 2 ] || { echo "error: --changes-file needs a path" >&2; exit 2; }
+      CHANGES_FILE="$2"; shift 2 ;;
     --skip-build) SKIP_BUILD=1; shift ;;
     -h|--help)    usage; exit 0 ;;
     *) echo "error: unknown option: $1" >&2; usage; exit 2 ;;
@@ -135,7 +144,23 @@ if git rev-parse --verify --quiet "refs/tags/$VERSION" >/dev/null; then
   echo "error: tag $VERSION already exists" >&2; exit 1
 fi
 
+# -- per-version changes -----------------------------------------------------
+if [ -z "$CHANGES_FILE" ]; then
+  CHANGES_FILE="release-notes/$VERSION.md"
+fi
+if [ ! -f "$CHANGES_FILE" ]; then
+  cat <<EOF >&2
+error: missing per-version changes file: $CHANGES_FILE
+
+Write the user-facing "What's in this release" bullets there before
+running the release. Summarize internal/tooling work as a single
+"General improvements" line.
+EOF
+  exit 1
+fi
+
 echo ">> Releasing $LATEST -> $VERSION  (HEAD: $(git rev-parse --short HEAD))"
+echo "   changes: $CHANGES_FILE"
 
 # -- build -------------------------------------------------------------------
 if [ "$SKIP_BUILD" -eq 0 ]; then
@@ -169,7 +194,10 @@ flips --create --bps-delta "$BASE_1_1" pokecrystal11.gbc \
   "$ROOT/Version USA, Europe Rev 1/Pokemon_Crystal_Legacy_Timeless_USA_1.1_Patch.bps" >/dev/null
 
 echo ">> Rendering patching README"
-sed "s/{{VERSION}}/$VERSION/g" tools/release-readme.template.md \
+sed -e "/{{CHANGES}}/r $CHANGES_FILE" \
+    -e "/{{CHANGES}}/d" \
+    -e "s/{{VERSION}}/$VERSION/g" \
+    tools/release-readme.template.md \
   > "$ROOT/Patching Instructions/README.md"
 cp "$ROOT/Patching Instructions/README.md" \
    "$ROOT/Patching Instructions/README.txt"
