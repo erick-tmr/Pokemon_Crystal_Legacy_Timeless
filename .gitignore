@@ -22,6 +22,12 @@ gfx/pokemon/*/frames.asm
 # local build artifacts (ROMs, saves, patches kept out of the repo)
 /builds/
 
+# base Crystal ROMs used by tools/release.sh to generate .bps patches
+/.baseroms/
+
+# staging area for release zips produced by tools/release.sh
+/release/
+
 # rgbds extras
 *.map
 *.sym
