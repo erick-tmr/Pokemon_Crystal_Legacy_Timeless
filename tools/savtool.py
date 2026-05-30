@@ -19,6 +19,11 @@ import re, os, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SYM  = os.path.join(ROOT, "pokecrystal11.sym")
 
+# Species count (constants/pokemon_constants.asm: CELEBI = 251 is the last entry).
+# Build-specific - re-derive if the roster ever changes. Used as the default fill
+# count for the Pokedex flag arrays.
+NUM_POKEMON = 251
+
 
 def load_syms(path):
     s = {}
@@ -99,6 +104,39 @@ class Sav:
             for i in range(nbytes): self.data[o + i] = 0
             for b in bits:          self.data[o + (b // 8)] |= (1 << (b % 8))
 
+    # --- Pokedex flags ---
+    # wPokedexSeen and wPokedexCaught are each a flag_array (1 bit per species,
+    # bit n = species n+1). The seen and caught arrays are SEPARATE and edited
+    # independently - e.g. set seen without caught to make every dex AREA page
+    # viewable without marking the mons as owned.
+    #
+    # GOTCHA: the in-game SEEN/OWN counter (engine/pokedex/pokedex.asm -> CountSetBits)
+    # sums every bit in the whole array, NOT just bits 0..NUM_POKEMON-1. So we must
+    # leave the unused trailing bits clear, or the counter reads too high (e.g. 256).
+    def _set_dex_array(self, wsym, count):
+        end = {"wPokedexSeen": "wEndPokedexSeen", "wPokedexCaught": "wEndPokedexCaught"}[wsym]
+        nbytes = self.syms[end][1] - self.syms[wsym][1]   # array length from the .sym
+        if not 0 <= count <= nbytes * 8:
+            raise SystemExit("dex count %d out of range 0..%d" % (count, nbytes * 8))
+        full, rem = divmod(count, 8)
+        pat = bytes([0xFF] * full
+                    + ([(1 << rem) - 1] if rem else [])
+                    + [0] * (nbytes - full - (1 if rem else 0)))
+        assert len(pat) == nbytes and sum(bin(b).count("1") for b in pat) == count
+        for base in (self.prim, self.bak):
+            o = base(wsym)
+            self.data[o:o + nbytes] = pat
+
+    def set_pokedex_seen(self, count=NUM_POKEMON):
+        """Mark the first `count` species SEEN (both copies). Independent of caught."""
+        self._set_dex_array("wPokedexSeen", count)
+
+    def set_pokedex_caught(self, count=NUM_POKEMON):
+        """Mark the first `count` species CAUGHT/OWNED (both copies). Independent of
+        seen - but in-game caught implies seen, so call set_pokedex_seen() too for a
+        consistent dex unless you specifically want caught-without-seen."""
+        self._set_dex_array("wPokedexCaught", count)
+
     def save(self, out=None):
         for lo, hi, co in [(self.GD, self.GDE, self.CHK), (self.BGD, self.BGDE, self.BCHK)]:
             s = self.sum16(self.data, lo, hi)
@@ -126,6 +164,9 @@ if __name__ == "__main__":
     # s.set_tmhm(tm_qty=99, hm_qty=1)
     # s.set_spawn_bits(ALL_FLY_SPAWNS)
     # s.set_list_pocket("wNumItems", 84, [(0x12, 99), (0x0E, 99)])   # bag: Potion x99, Full Restore x99
+    # s.set_pokedex_seen()                       # all 251 species seen (every AREA page viewable)
+    # s.set_pokedex_caught()                     # all 251 species caught/owned
+    # s.set_pokedex_seen(); s.set_pokedex_caught()   # full dex (seen + caught)
     # s.save()
     print("loaded OK; both checksums reproduce (safe to edit). "
           "Uncomment edits + s.save() to apply.")

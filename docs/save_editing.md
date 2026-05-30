@@ -27,6 +27,7 @@ PKHeX or replaying the game.
    - [Key items (id-only list)](#key-items)
    - [TMs / HMs (fixed quantity array)](#tms--hms)
    - [Fly destinations (visited-spawn flags)](#fly-destinations)
+   - [Pokédex seen / caught (flag arrays)](#pokédex-seen--caught)
 7. [Item IDs](#item-ids)
 8. [The reusable tool: `savtool.py`](#the-reusable-tool-savtoolpy)
 9. [Regenerating addresses after a rebuild](#regenerating-addresses-after-a-rebuild)
@@ -146,6 +147,8 @@ Build-derived (`pokecrystal11.sym`), primary and backup. Backup = primary − `0
 | PC items list                 | `wPCItems`       | `0x259D` | `0x179D` | `[id,qty]…[FF]`, cap **49** |
 | TM/HM quantities              | `wTMsHMs`        | `0x23E7` | `0x15E7` | fixed **57**-byte array, no count |
 | Visited spawns (Fly)          | `wVisitedSpawns` | `0x2833` | `0x1A33` | 28-bit flag array (4 bytes) |
+| Pokédex caught/owned          | `wPokedexCaught` | `0x2A27` | `0x1C27` | flag_array, **32** bytes (1 bit/species) |
+| Pokédex seen                  | `wPokedexSeen`   | `0x2A47` | `0x1C47` | flag_array, **32** bytes (1 bit/species) |
 | Checksum (primary/backup)     | `sChecksum`      | `0x2D0D` | `0x1F0D` | dw, little-endian |
 
 Capacities come from `constants/item_data_constants.asm`:
@@ -226,6 +229,39 @@ byte = n // 8,   mask = 1 << (n % 8)      (LSB-first within each byte)
   bit math). This unlocks the *destinations*; you still need a Pokémon that knows Fly to
   use it in the field.
 
+### Pokédex seen / caught
+
+The Pokédex tracks two **independent** `flag_array`s — one bit per species, bit `n` =
+species `n+1` (LSB-first within each byte):
+
+| Array            | Meaning                  | Primary  | Backup   | Length |
+|------------------|--------------------------|----------|----------|--------|
+| `wPokedexSeen`   | entry seen (sprite/area) | `0x2A47` | `0x1C47` | 32 bytes |
+| `wPokedexCaught` | entry owned (full data)  | `0x2A27` | `0x1C27` | 32 bytes |
+
+- `NUM_POKEMON = 251` (CELEBI is the last species, `constants/pokemon_constants.asm`),
+  so a "complete" array sets bits 0–250 = **31 bytes of `0xFF` then `0x07`**
+  (`0xFF…FF 07`). 248 + 3 = 251 bits.
+- **Seen and caught are separate on purpose.** Setting *seen* alone makes every Pokédex
+  **AREA** page viewable (the area map only shows a mon once it's seen) without marking
+  the mons as owned. In-game, caught implies seen, so for a *consistent* full dex set
+  both; caught-without-seen is possible but non-canonical.
+- **GOTCHA — don't fill the whole byte.** The in-game SEEN/OWN counter
+  (`engine/pokedex/pokedex.asm` → `CountSetBits` over `wEndPokedex* - wPokedex*`) sums
+  **every bit in the 32-byte array**, not just bits 0–250. If you set the unused top 5
+  bits of the last byte (`0xFF` instead of `0x07`), the counter reads **256** instead of
+  251. Leave the trailing bits clear. `savtool.py` derives the exact pattern for you.
+
+`savtool.py` exposes these as `set_pokedex_seen()` / `set_pokedex_caught()` (each writes
+both copies; the default count is `NUM_POKEMON`):
+
+```python
+s.set_pokedex_seen()                       # all 251 seen — every AREA page viewable
+s.set_pokedex_caught()                     # all 251 caught/owned
+s.set_pokedex_seen(); s.set_pokedex_caught()   # full dex
+s.set_pokedex_seen(151)                    # first 151 only (partial)
+```
+
 ---
 
 ## Item IDs
@@ -270,6 +306,8 @@ s.set_keyitems(ALL_KEY_ITEMS)         # all 25 key items
 s.set_tmhm(tm_qty=99, hm_qty=1)       # all TMs x99, all HMs x1
 s.set_spawn_bits(ALL_FLY_SPAWNS)      # all 24 fly destinations
 s.set_list_pocket("wNumItems", 84, [(0x12, 99), (0x0E, 99)])  # bag: Potion x99, Full Restore x99
+s.set_pokedex_seen()                  # all 251 species seen (every AREA page viewable)
+s.set_pokedex_caught()                # all 251 species caught/owned (omit for seen-only)
 s.save()                              # recompute checksums + write + verify
 ```
 
