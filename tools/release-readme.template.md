@@ -4,8 +4,6 @@
 dependence removed, shipped as an **MBC5** cartridge so it runs safely on RTC-less hardware
 (FPGA cores, flash carts, emulators) without corrupting saves.
 
-> ⚠️ This is a **0.x pre-release** — not yet verified on real hardware.
-
 See [TIMELESS.md](https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless/blob/main/TIMELESS.md) for the full event-by-event reference.
 
 # What's in this release
