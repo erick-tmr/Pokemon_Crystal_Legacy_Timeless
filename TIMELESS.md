@@ -92,8 +92,8 @@ offsets through the same routine, so the choice is purely about convenience:
 - **Pokégear shortcut** *(Timeless addition)* — open the Pokégear, land on the **Clock**
   card, then **hold SELECT and press UP**. The same clock-setting screen opens without
   having to return to the title. Useful for mid-route adjustments (flip to night for a
-  Hoothoot, swap to Monday morning for the bargain shop, advance a day to collect Kurt's
-  balls, etc.). The combo is deliberately obscure so the time can't be changed by mistake,
+  Hoothoot, swap to Monday morning for the bargain shop, advance a day to re-roll the
+  daily swarm, etc.). The combo is deliberately obscure so the time can't be changed by mistake,
   and the screen still asks for YES/NO confirmation before applying.
 
 Use any of them any time you want to change the time of day, the weekday, or bump the day
@@ -156,7 +156,9 @@ gone. No day-advance needed to reuse them.
 | **Haircut brothers** (Goldenrod Underground) | Raises a party Pokémon's happiness | **weekday picks the brother** — older: Tue/Thu/Sat, younger: Sun/Wed/Fri | Get a haircut, then talk again to repeat; set the weekday for older vs. younger |
 | **Buena's Password** (Radio Tower 2F) | +1 Blue Card point (toward prizes, cap 30) | **night only** | **Set the clock to night**, tune the radio for the password, then answer Buena — repeat to grind points |
 | **Goldenrod bargain shop** (Underground) | Sells discounted items | **Monday morning only** | **Set the clock to Monday + morning**, then buy as many times as you want |
-| **Indigo rival rematch** (Pokémon Center) | Battle Silver for XP/money | **appears Mon/Wed only** | **Set the weekday to Mon or Wed**, walk onto the trigger tile; re-enter the map to refight |
+| **Indigo rival rematch** (Pokémon Center) | Battle Silver for XP/money | **appears Mon/Wed only** | **Set the weekday to Mon or Wed**, walk onto the trigger tile; re-enter the map to refight (see the trade-off note in §5) |
+| **Kurt's Apricorn balls** (Azalea Town) | Hand over an Apricorn, get the matching Poké Ball | which ball depends on the Apricorn color | Give an Apricorn — Kurt finishes it **instantly, same visit**; talk again to hand over more (a Crystal Legacy change, not the vanilla overnight wait) |
+| **Time Capsule** (Pokémon Center 2F) | Gen-1 trade link | **must have met Bill** (Ecruteak) | Use it any time after meeting Bill — the one-time "being adjusted" day-wait is removed, no day-advance needed |
 
 ### 2. Once-per-day events — refresh by advancing the day (UNTOUCHED)
 
@@ -165,10 +167,8 @@ clock screen.
 
 | Event | What it does | How to trigger / refresh |
 |---|---|---|
-| **Kurt's Apricorn balls** | Hand Kurt Apricorns; he makes balls "by the next day" | Give Apricorns → **advance the day once** → collect finished balls |
 | **Daily-gift NPCs** | Various "here's something for today" givers | Receive once → **advance the day** to receive again |
 | **Daily swarms** (Dunsparce, Yanma, fishing swarms) | A species floods a route/water for the day | **Advance the day** to re-roll which swarm is active |
-| **Time Capsule** (once-a-day use) | Gen-1 trade link | **Advance the day** to use again |
 
 ### 3. Weekday-locked events — set the weekday (UNTOUCHED)
 
@@ -200,8 +200,26 @@ These check the hour. **Set the time of day** in the clock screen.
   event flags. Its "today" flag only controls the *"come back tomorrow before you can return
   him"* timing, so it was **left untouched**. **Consequence:** after you receive Shuckie,
   **advance the day once** before Mania will let you return him — exactly like vanilla.
-- **Kurt's Apricorn balls** — the "ready by the next day" delay was **kept on purpose** (see
-  table 2). Hand over Apricorns, advance the day, collect.
+- **Kurt's Apricorn balls** — Crystal Legacy already makes Kurt finish balls **instantly** (no
+  overnight wait), so there's nothing to advance the clock for. Hand over an Apricorn and he
+  hands the finished ball right back on the **same visit** (see table 1). The old "come back
+  tomorrow" path only survives for the **GS Ball**.
+- **Indigo Plateau rival rematch** — the rival ambush is a **step-on-tile trigger** in the
+  Pokémon Center, on the short corridor between the front desk and the Elite Four door. With the
+  once-per-day flag removed (table 1), there's no "already fought today" state to stop it, so on a
+  **Mon/Wed** it fires **every time you cross that tile**. In practice: step **up** onto the tile
+  → forced rival battle → afterward the rival leaves and you pick **up** (continue into the Elite
+  Four rooms) or **down** (back to the Nurse to heal / Clerk to shop). Walking **back onto the
+  tile** to re-enter the Elite Four starts the fight **again**, so go in prepared. You can't slip
+  past it while it's live, and you **can't run from the rival** (it's a Trainer battle) — the only
+  way to make the tile safe to cross is to **set the weekday to anything other than Mon/Wed**,
+  which disables the trigger (and also puts the rematch on hold until you set Mon/Wed again).
+
+  > **Want to heal or shop right before the Elite Four?** Do the rival rematch first, then open
+  > the clock screen and **change the weekday off Mon/Wed** (the **SELECT + UP** Pokégear shortcut
+  > is fastest). With the trigger disabled you can walk down to the Nurse/Clerk and back up onto
+  > the tile and into the Elite Four **without re-fighting**. Set Mon/Wed again next time you want
+  > the rematch.
 - **Bug-Catching Contest timer** — the in-contest 20-minute countdown measured *real elapsed
   minutes*, so with a frozen clock it **no longer ticks down on its own**. The contest still
   runs; it just won't time you out. This is an accepted trade-off of freezing the clock.

@@ -50,7 +50,10 @@ EcruteakPokecenter1F_MapScripts:
 	playsound SFX_EXIT_BUILDING
 	disappear ECRUTEAKPOKECENTER1F_BILL
 	clearevent EVENT_MET_BILL
-	setflag ENGINE_TIME_CAPSULE
+	; No RTC: don't set the "being adjusted" daily flag, so the Time Capsule is
+	; usable as soon as you've met Bill instead of only from the next day onward.
+	; (Checked in maps/Pokecenter2F.asm; meeting Bill is still required.)
+	; setflag ENGINE_TIME_CAPSULE
 	setscene SCENE_FINISHED
 	waitsfx
 	end
