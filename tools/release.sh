@@ -9,6 +9,9 @@
 #   5. Bundle patches + README into a zip matching the v0.1.0 layout
 #   6. Tag HEAD, push the tag, and create a GitHub release with the zip
 #
+# Before releasing: bump the title-screen version graphic to match the new
+# tag and merge that PR first:  tools/bump_title_version.py <X.Y.Z> --pr
+#
 # Requires: rgbds 0.5.2, flips, gh (authenticated), zip, sha1sum, awk
 #
 # Usage:
