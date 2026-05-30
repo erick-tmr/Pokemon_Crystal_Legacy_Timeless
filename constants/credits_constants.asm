@@ -157,6 +157,8 @@
 	const POKECRYSTAL14
 	const POKECRYSTALDISASSEMBLY
 	const NAYRUTHANKSTEXT
+	const TIMELESS_TITLE
+	const ERICK_TAKESHI
 NUM_CREDITS_STRINGS EQU const_value
 
 ; CreditsScript indexes (see data/credits_script.asm)

@@ -158,6 +158,8 @@ CreditsStringsPointers:
 	dw .Pokecrystal14
 	dw .Pokecrystal
 	dw .NayruThanksText
+	dw .TimelessTitle
+	dw .ErickTakeshi
 	assert_table_length NUM_CREDITS_STRINGS
 
 .SatoshiTajiri:       db "   SATOSHI TAJIRI@"         ; "たじり　さとし@"
@@ -325,6 +327,9 @@ CreditsStringsPointers:
 .NayruThanksText:     db "   IMPROVED DEX"
 					next " POKEMON DVS SCREEN"
 					next "      MADE BY@"
+.TimelessTitle:       db "  TIMELESS EDITION"
+					next "         BY@"
+.ErickTakeshi:        db "   ERICK TAKESHI@"
 
 .Copyright:
 	;    (C) 1  9  9  5 - 2  0  0  1     N  i  n  t  e  n  d  o

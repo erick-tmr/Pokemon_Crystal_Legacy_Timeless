@@ -15,6 +15,12 @@ CreditsScript:
 
 	db CREDITS_WAIT, 1
 
+; Crystal Legacy Timeless
+	db        TIMELESS_TITLE, 1
+	db         ERICK_TAKESHI, 3
+
+	db CREDITS_WAIT, 16
+
 ; Update the banner.
 	db CREDITS_SCENE, 2 ; Ditto
 
