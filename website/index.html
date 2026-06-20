@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pokémon Crystal Legacy: Timeless — an RTC-free MBC5 fork</title>
+<meta name="description" content="Pokémon Crystal Legacy Timeless removes the Real-Time Clock and ships as MBC5, so it runs safely on flash carts, FPGA cores and emulators without corrupting your save. Time becomes a value you control.">
+<link rel="canonical" href="https://erick-tmr.github.io/Pokemon_Crystal_Legacy_Timeless/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://erick-tmr.github.io/Pokemon_Crystal_Legacy_Timeless/">
+<meta property="og:title" content="Pokémon Crystal Legacy: Timeless">
+<meta property="og:description" content="A Crystal Legacy fork with no Real-Time Clock — ships as MBC5, hands time back to you, and never corrupts your save.">
+<meta property="og:image" content="https://erick-tmr.github.io/Pokemon_Crystal_Legacy_Timeless/assets/celebi-suicune-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0f1c16">
+<link rel="icon" href="assets/celebi_final.png" type="image/png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; }
+  ::selection { background: #8ec63f; color: #0f1c16; }
+  @keyframes celebiSprite { from { background-position: center 0; } to { background-position: center -560px; } }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  @keyframes bobSlow { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-16px) rotate(2deg); } }
+  @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+  @keyframes shimmer { 0%,100% { opacity: .35; transform: scale(1); } 50% { opacity: .8; transform: scale(1.12); } }
+  @keyframes drift { 0% { transform: translate(0,0); } 50% { transform: translate(14px,-22px); } 100% { transform: translate(0,0); } }
+  @keyframes raysSweep { 0%,100% { opacity: .5; } 50% { opacity: .85; } }
+  @keyframes langPeek { 0%{opacity:0; transform:translateY(-18px) scale(.5);} 9%{opacity:1; transform:translateY(0) scale(1);} 15%{transform:translateY(0) scale(1.07);} 22%{transform:translateY(0) scale(1);} 84%{opacity:1; transform:translateY(0) scale(1);} 100%{opacity:0; transform:translateY(-12px) scale(.9);} }
+  @keyframes peekBob { 0%,100%{transform:rotate(-5deg) translateY(0);} 50%{transform:rotate(5deg) translateY(-5px);} }
+  @keyframes arrowPulse { 0%,100%{transform:translateY(0); opacity:.85;} 50%{transform:translateY(-4px); opacity:1;} }
+  summary { list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  .spoilerChev { transition: transform .2s ease; }
+  details[open] .spoilerChev { transform: rotate(90deg); }
+</style>
+</head>
+<body>
+<div style="font-family:'Outfit',sans-serif; background:#0f1c16; color:#e7eee2; -webkit-font-smoothing:antialiased; overflow-x:hidden;" id="i18nRoot">
+
+  <!-- ================= NAV ================= -->
+  <nav style="position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:14px 28px; background:rgba(13,26,20,.82); backdrop-filter:blur(14px); border-bottom:1px solid rgba(142,198,63,.18);">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="width:48px; height:42px; flex:none; background-image:url('assets/celebi_final.png'); background-size:contain; background-repeat:no-repeat; background-position:center; image-rendering:pixelated; filter:drop-shadow(0 0 5px rgba(142,198,63,.95)) drop-shadow(0 0 12px rgba(142,198,63,.6));"></div>
+      <div style="line-height:1;">
+        <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:.5px;">CRYSTAL LEGACY</div>
+        <div style="font-size:12px; color:#9fb09a; margin-top:5px; letter-spacing:2px;">TIMELESS VERSION</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:26px; font-size:14px; font-weight:500;">
+      <a href="#bug" style="color:#c5d2bd; text-decoration:none;" data-i18n="navBug">The Bug</a>
+      <a href="#clock" style="color:#c5d2bd; text-decoration:none;" data-i18n="navClock">The Clock</a>
+      <a href="#events" style="color:#c5d2bd; text-decoration:none;" data-i18n="navEvents">Events</a>
+      <a href="#celebi" style="color:#c5d2bd; text-decoration:none;">Celebi</a>
+      <button type="button" onclick="toggleLang()" id="langBtn" title="Português / English" style="font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:.5px; color:#cfe6a8; background:rgba(20,38,28,.6); border:1px solid rgba(142,198,63,.4); border-radius:9px; padding:10px 11px; cursor:pointer;">PT</button>
+      <a href="https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:10px; background:#8ec63f; color:#10261a; font-weight:600; text-decoration:none; box-shadow:0 4px 14px rgba(142,198,63,.3);">GitHub ↗</a>
+    </div>
+
+    <!-- language hint: celebi peeks in, points to the toggle, then vanishes -->
+    <div id="langHint" style="position:absolute; top:100%; left:0; display:none; z-index:70; pointer-events:none; transform-origin:top center;">
+      <div style="display:flex; align-items:flex-start; gap:4px;">
+        <div style="width:62px; height:62px; flex:none; image-rendering:auto; background-image:url('assets/celebi_pointer.png'); background-size:contain; background-repeat:no-repeat; background-position:center bottom; animation:peekBob 0.9s ease-in-out infinite; filter:drop-shadow(0 6px 10px rgba(0,0,0,.45));"></div>
+        <div style="position:relative; margin-top:6px; background:#fff; border:2px solid #2a6f3a; border-radius:12px; padding:9px 13px; box-shadow:0 0 0 3px rgba(142,198,63,.35), 0 10px 24px rgba(0,0,0,.4); white-space:nowrap;">
+          <div data-tail="1" style="position:absolute; top:-7px; right:18px; width:12px; height:12px; background:#fff; border-top:2px solid #2a6f3a; border-right:2px solid #2a6f3a; transform:rotate(-45deg); animation:arrowPulse 1s ease-in-out infinite;"></div>
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#1c5a2a; line-height:1.5;">Também em<br>Português!</div>
+          <div style="font-size:11px; color:#3f8f4a; margin-top:5px; font-weight:600;">toque em PT ↑</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================= HERO ================= -->
+  <header style="position:relative; min-height:88vh; display:flex; align-items:center; overflow:hidden; padding:64px 28px;">
+    <div style="position:absolute; inset:0; background-image:url('assets/hero-art.png'); background-size:cover; background-position:center 30%;"></div>
+    <div style="position:absolute; inset:0; background:linear-gradient(90deg, rgba(11,22,17,.94) 0%, rgba(11,22,17,.78) 42%, rgba(11,22,17,.35) 72%, rgba(11,22,17,.55) 100%);"></div>
+    <div style="position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,22,17,.55) 0%, rgba(11,22,17,0) 24%, rgba(11,22,17,0) 60%, #0f1c16 100%);"></div>
+    <!-- light rays -->
+    <div style="position:absolute; top:-10%; left:30%; width:60%; height:120%; background:linear-gradient(115deg, rgba(213,228,202,.16) 0%, rgba(213,228,202,0) 40%); transform:rotate(8deg); animation:raysSweep 7s ease-in-out infinite; pointer-events:none;"></div>
+
+    <div style="position:relative; width:100%; max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1.4fr .9fr; gap:40px; align-items:center;">
+      <div>
+        <div style="display:inline-flex; align-items:center; gap:10px; padding:7px 14px; border:1px solid rgba(142,198,63,.45); border-radius:999px; background:rgba(20,38,28,.55); font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:.5px; color:#b6d98f;">
+          <span style="width:7px; height:7px; border-radius:50%; background:#8ec63f; box-shadow:0 0 8px #8ec63f;"></span>
+          DMG-HACK-USA &nbsp;·&nbsp; MBC5 &nbsp;·&nbsp; NO RTC
+        </div>
+
+        <h1 style="margin:22px 0 0; font-family:'Outfit',sans-serif; font-weight:600; font-size:clamp(20px,2.4vw,28px); letter-spacing:6px; color:#cfe0c4; text-transform:uppercase;">Pokémon Crystal Legacy</h1>
+        <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(64px,11vw,150px); line-height:.86; letter-spacing:-3px; margin:6px 0 0; background:linear-gradient(180deg,#f4f7ec 0%, #cfe6a8 55%, #8ec63f 100%); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 10px 40px rgba(142,198,63,.18);">TIMELESS</div>
+        <div style="display:flex; align-items:center; gap:14px; margin-top:14px;">
+          <span style="font-family:'Press Start 2P',monospace; font-size:12px; color:#8ec63f; letter-spacing:1px;" data-i18n="heroVersion">VERSION</span>
+          <span style="height:1px; flex:1; max-width:220px; background:linear-gradient(90deg,#8ec63f,transparent);"></span>
+        </div>
+
+        <p style="max-width:540px; margin:26px 0 0; font-size:18px; line-height:1.6; color:#cdd8c5;" data-i18n="heroTag">Gotta catch even more, <strong style="color:#f1f6ea;">now without a clock.</strong> A fork of Crystal Legacy that rips out every Real-Time Clock dependency and ships as an <strong style="color:#b6d98f;">MBC5</strong> cart, so it runs safely on flash carts, FPGA cores and emulators, <em style="color:#e7eee2;">without corrupting your save.</em></p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:32px;">
+          <a href="https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless/releases/latest" style="display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:12px; background:#8ec63f; color:#10261a; font-weight:700; font-size:16px; text-decoration:none; box-shadow:0 10px 30px rgba(142,198,63,.32);" data-i18n="btnDownload">▶ Download the patch</a>
+          <a href="#bug" style="display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:12px; background:rgba(20,38,28,.6); border:1px solid rgba(142,198,63,.35); color:#e7eee2; font-weight:600; font-size:16px; text-decoration:none;" data-i18n="btnWhy">Why it exists →</a>
+        </div>
+
+        <div style="display:inline-flex; align-items:center; gap:12px; margin-top:30px; padding:10px 14px; border-radius:10px; background:rgba(8,16,12,.6); border:1px solid rgba(142,198,63,.2); font-family:'Press Start 2P',monospace; font-size:9px; color:#9fb09a; letter-spacing:.5px;">
+          <span style="color:#6f8167;">CART $0147</span>
+          <span style="color:#8ec63f;">0x1B</span>
+          <span style="color:#6f8167;">MBC5 + RAM + BATTERY</span>
+        </div>
+      </div>
+
+      <!-- celebi & suicune card -->
+      <div style="justify-self:center; position:relative;">
+        <div style="position:absolute; inset:-14% -10%; background:radial-gradient(circle, rgba(142,198,63,.3), transparent 65%); filter:blur(8px);"></div>
+        <div style="position:relative; transform:rotate(3deg); border-radius:16px; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.1); animation:bobSlow 9s ease-in-out infinite;">
+          <img src="assets/celebi-suicune-card.png" alt="Celebi &amp; Suicune carddass card" style="display:block; width:300px; max-width:40vw; height:auto;">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= INTRO BAND ================= -->
+  <section style="background:linear-gradient(180deg,#0f1c16, #122218); padding:70px 28px; border-top:1px solid rgba(142,198,63,.12);">
+    <div style="max-width:1000px; margin:0 auto; text-align:center;">
+      <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:#7e9a4f; letter-spacing:1px;" data-i18n="introEyebrow">A CRYSTAL LEGACY FORK</div>
+      <p style="font-size:clamp(22px,2.8vw,32px); line-height:1.45; font-weight:300; color:#e7eee2; margin:20px auto 0; max-width:880px; text-wrap:pretty;" data-i18n="introPara">Original Crystal tells time with a battery-backed clock chip. On hardware that doesn't have one, those clock reads quietly <strong style="font-weight:600; color:#f1f6ea;">scribble over your saved Pokémon.</strong> Timeless removes the clock entirely and hands time back to <strong style="font-weight:600; color:#8ec63f;">you</strong>.</p>
+      <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-top:36px;">
+        <div style="padding:18px 24px; border-radius:14px; background:rgba(20,38,28,.55); border:1px solid rgba(142,198,63,.16); min-width:180px;">
+          <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:30px; color:#8ec63f;">0</div>
+          <div style="font-size:13px; color:#a9b8a2; margin-top:4px;" data-i18n="stat1">RTC reads &amp; writes</div>
+        </div>
+        <div style="padding:18px 24px; border-radius:14px; background:rgba(20,38,28,.55); border:1px solid rgba(142,198,63,.16); min-width:180px;">
+          <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:30px; color:#8ec63f;">100%</div>
+          <div style="font-size:13px; color:#a9b8a2; margin-top:4px;" data-i18n="stat2">Save format unchanged</div>
+        </div>
+        <div style="padding:18px 24px; border-radius:14px; background:rgba(20,38,28,.55); border:1px solid rgba(142,198,63,.16); min-width:180px;">
+          <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:30px; color:#8ec63f;">∞</div>
+          <div style="font-size:13px; color:#a9b8a2; margin-top:4px;" data-i18n="stat3">Control over time</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THE BUG ================= -->
+  <section id="bug" style="background:#11201a; padding:90px 28px; scroll-margin-top:80px;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+        <span style="width:34px; height:3px; background:#b4452f; border-radius:2px;"></span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#cf6b52; letter-spacing:1px;" data-i18n="bugEyebrow">WHY THIS FORK EXISTS</span>
+      </div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bugH2">The clock that ate Box 8</h2>
+      <p style="max-width:720px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="bugIntro">Original Crystal uses an <strong style="color:#e7eee2;">MBC3</strong> mapper with a battery-backed Real-Time Clock. The game tells time by talking to that chip. On hardware <strong style="color:#e7eee2;">without a real RTC</strong>, those conversations don't return garbage. They silently overwrite your <strong style="color:#e89a86;">saved game</strong>.</p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-top:42px;">
+        <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(180,69,47,.28);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:11px; color:#cf6b52;">01</div>
+          <h3 style="font-size:19px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="bugC1T">A register doing double duty</h3>
+          <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="bugC1B">On MBC3, writing <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">$4000</code> picks an SRAM bank (<code style="color:#e6c07a;">$00–$03</code>) <em>or</em> an RTC register (<code style="color:#e6c07a;">$08–$0C</code>). Same address, two jobs.</p>
+        </div>
+        <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(180,69,47,.28);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:11px; color:#cf6b52;">02</div>
+          <h3 style="font-size:19px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="bugC2T">No clock, no clock mode</h3>
+          <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="bugC2B">With no RTC, the mapper has no <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">$08–$0C</code> mode. The day-low selector <code style="color:#e6c07a;">$0B</code> is treated as plain SRAM bank 3, which on this save layout begins exactly at <strong style="color:#e89a86;">Box 8</strong>.</p>
+        </div>
+        <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(180,69,47,.28);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:11px; color:#cf6b52;">03</div>
+          <h3 style="font-size:19px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="bugC3T">Reads &amp; writes corrupt</h3>
+          <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="bugC3B"><strong style="color:#e7eee2;">Writing</strong> the clock scribbles time bytes over Box 8. <strong style="color:#e7eee2;">Reading</strong> it loads box bytes <em>as the current time</em>, so the clock lurches around whenever you pick berries, battle, or open the Pokégear.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:16px; margin-top:24px; padding:22px 24px; border-radius:14px; background:rgba(180,69,47,.1); border:1px solid rgba(180,69,47,.3);">
+        <span style="font-size:24px; line-height:1;">⚠️</span>
+        <p style="margin:0; font-size:15px; line-height:1.6; color:#e7d3cc;" data-i18n="bugWarn">Worse: the garbage day count routinely reads as “&gt;140 days passed,” so the time fix-up code calls <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">SetClock</code> to “correct” it, causing <strong style="color:#f1ddd6;">more writes, more corruption.</strong> This is the bug behind “Box 8 keeps getting wiped” and “the clock changes on its own.”</p>
+      </div>
+
+      <!-- the fix -->
+      <div style="margin-top:42px; display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+        <div style="padding:28px; border-radius:16px; background:#1a2d22; border:1px solid rgba(142,198,63,.25);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="fixLabel">THE FIX</div>
+          <h3 style="font-size:22px; margin:14px 0 10px; color:#f1f6ea;" data-i18n="fixTitle">Ship as MBC5</h3>
+          <p style="font-size:15px; line-height:1.65; color:#b6c4ae; margin:0;" data-i18n="fixBody">If the game never touches the RTC, it never needs the clock hardware at all. MBC5 is a strict superset of MBC3's <em>banking</em> (same SRAM selects, same ROM banking), but it has <strong style="color:#b6d98f;">no RTC and no <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">$08–$0C</code> mode</strong>. Even a stray clock-style write has nowhere to land as a clock. The corruption path simply can't be re-enabled.</p>
+        </div>
+        <div style="padding:28px; border-radius:16px; background:#1a2d22; border:1px solid rgba(142,198,63,.25); display:flex; flex-direction:column; justify-content:center; gap:14px;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span style="font-family:'Press Start 2P',monospace; font-size:11px; color:#6f8167; width:96px;" data-i18n="saveFmtLabel">SAVE FORMAT</span>
+            <span style="font-size:15px; color:#e7eee2;" data-i18n="saveFmtVal">Identical. Box layout, 32 KB SRAM &amp; battery all unchanged.</span>
+          </div>
+          <div style="height:1px; background:rgba(142,198,63,.14);"></div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span style="font-family:'Press Start 2P',monospace; font-size:11px; color:#6f8167; width:96px;" data-i18n="yourSavLabel">YOUR .SAV</span>
+            <span style="font-size:15px; color:#e7eee2;" data-i18n="yourSavVal">Existing saves work as-is. No byte patching needed.</span>
+          </div>
+          <div style="height:1px; background:rgba(142,198,63,.14);"></div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span style="font-family:'Press Start 2P',monospace; font-size:11px; color:#6f8167; width:96px;" data-i18n="hwLabel">HARDWARE</span>
+            <span style="font-size:15px; color:#e7eee2;" data-i18n="hwVal">Flash carts, FPGA cores &amp; emulators, all verified solid.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THE CLOCK ================= -->
+  <section id="clock" style="background:linear-gradient(180deg,#11201a,#0f1c16); padding:90px 28px; scroll-margin-top:80px;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+        <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="clockEyebrow">CONTROL TIME YOURSELF</span>
+      </div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="clockH2">A frozen clock you control</h2>
+      <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="clockIntro">With the RTC gone, time is a <strong style="color:#e7eee2;">software value you set</strong> that never advances on its own. Set it to night and grind for an hour, and it stays night. Day &amp; night palettes are stable. The day counter only moves when <strong style="color:#8ec63f;">you</strong> move it.</p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-top:42px;">
+        <div style="padding:28px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+          <div style="font-size:30px;">🌗</div>
+          <h3 style="font-size:19px; margin:16px 0 8px; color:#f1f6ea;" data-i18n="todTitle">Time of day</h3>
+          <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="todBody">Morn / Day / Nite. Drives wild encounters &amp; palettes, and time-locked NPCs like Daisy at 3 PM, Buena at night, and the bargain shop in the morning.</p>
+        </div>
+        <div style="padding:28px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+          <div style="font-size:30px;">📅</div>
+          <h3 style="font-size:19px; margin:16px 0 8px; color:#f1f6ea;" data-i18n="wdTitle">Weekday</h3>
+          <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="wdBody">Mon–Sun. Sets every weekday-locked event, from Lapras on Friday to the rooftop sale, the weekly sibling NPCs, and which haircut brother is in.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:14px; margin-top:22px; padding:20px 22px; border-radius:14px; background:rgba(142,198,63,.08); border:1px solid rgba(142,198,63,.28);">
+        <span style="font-size:20px; line-height:1.2;">✅</span>
+        <p style="margin:0; font-size:14.5px; line-height:1.6; color:#cfe0c4;" data-i18n="noWait"><strong style="color:#eaf3d8;">No more waiting.</strong> This version makes the old day-locked rewards instant, so you almost never need to advance the day. The one exception is <strong style="color:#cfe6a8;">Kurt's GS Ball</strong>: hand it over, then advance a day in the clock screen to trigger the Celebi encounter event in Ilex Forest (it moves Kurt out of his house, the normal event flow).</p>
+      </div>
+
+      <!-- entry points -->
+      <h3 style="font-size:21px; color:#e7eee2; margin:46px 0 6px; font-family:'Space Grotesk',sans-serif;" data-i18n="entryH3">Three ways to open the clock screen</h3>
+      <p style="font-size:15px; color:#9fb09a; margin:0 0 22px;" data-i18n="entrySub">All three write the same offsets, so pick whichever is convenient.</p>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;">
+        <div style="padding:22px; border-radius:14px; background:rgba(20,38,28,.5); border:1px solid rgba(142,198,63,.16);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#7e9a4f; letter-spacing:.5px;">OPTION A</div>
+          <div style="font-size:16px; font-weight:600; color:#f1f6ea; margin:10px 0 6px;" data-i18n="optAName">New Game</div>
+          <p style="font-size:13.5px; line-height:1.55; color:#a9b8a2; margin:0;" data-i18n="optABody">The normal “set the time” prompt at the start of the game.</p>
+        </div>
+        <div style="padding:22px; border-radius:14px; background:rgba(20,38,28,.5); border:1px solid rgba(142,198,63,.16);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#7e9a4f; letter-spacing:.5px;">OPTION B</div>
+          <div style="font-size:16px; font-weight:600; color:#f1f6ea; margin:10px 0 6px;" data-i18n="optBName">Title screen reset</div>
+          <p style="font-size:13.5px; line-height:1.55; color:#a9b8a2; margin:0;" data-i18n="optBBody">Hold <strong style="color:#cfe6a8;">Down + B</strong> on the Suicune-leap title screen to re-open the vanilla clock reset.</p>
+        </div>
+        <div style="padding:22px; border-radius:14px; background:rgba(20,38,28,.5); border:1px solid rgba(142,198,63,.3); position:relative; overflow:hidden;">
+          <div style="position:absolute; top:12px; right:12px; font-family:'Press Start 2P',monospace; font-size:7px; color:#10261a; background:#8ec63f; padding:4px 6px; border-radius:5px;" data-i18n="newBadge">NEW</div>
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#8ec63f; letter-spacing:.5px;">OPTION C</div>
+          <div style="font-size:16px; font-weight:600; color:#f1f6ea; margin:10px 0 6px;" data-i18n="optCName">Pokégear shortcut</div>
+          <p style="font-size:13.5px; line-height:1.55; color:#b6c4ae; margin:0;" data-i18n="optCBody">On the Pokégear <strong style="color:#cfe6a8;">Clock</strong> card, hold <strong style="color:#cfe6a8;">SELECT + UP</strong>. Adjust time mid-route without leaving for the title.</p>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:14px; margin-top:22px; padding:20px 22px; border-radius:14px; background:rgba(230,192,122,.08); border:1px solid rgba(230,192,122,.28);">
+        <span style="font-size:20px; line-height:1.2;">💡</span>
+        <p style="margin:0; font-size:14.5px; line-height:1.6; color:#e3d6b8;" data-i18n="clockTip"><strong style="color:#f0e6cf;">Prefer moving time forward.</strong> The daily reset is driven by the day <em>rolling over</em>, not by today's date being later. If you set the clock backward past midnight, some daily flags stay “already done today” until you advance forward through a midnight again.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= EVENTS ================= -->
+  <section id="events" style="background:#11201a; padding:90px 28px; scroll-margin-top:80px;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+        <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="evEyebrow">TIME-BASED EVENTS</span>
+      </div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="evH2">Nothing removed, just driven by you</h2>
+      <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="evIntro">Almost every daily/weekly event keys off the day counter, not the clock chip, so they all still work. They just advance when you move the clock. One category got <strong style="color:#8ec63f;">better</strong>:</p>
+
+      <!-- headline: always available -->
+      <div style="margin-top:36px; border-radius:18px; overflow:hidden; border:1px solid rgba(142,198,63,.28); background:#0f1c16;">
+        <div style="display:flex; align-items:center; gap:12px; padding:20px 26px; background:linear-gradient(90deg, rgba(142,198,63,.18), rgba(142,198,63,.04));">
+          <span style="font-size:22px;">♾️</span>
+          <div>
+            <div style="font-size:19px; font-weight:700; color:#f1f6ea;" data-i18n="alwaysTitle">Always available: daily limit removed</div>
+            <div style="font-size:13.5px; color:#9fb09a; margin-top:2px;" data-i18n="alwaysSub">These repeatable benefits no longer track a “did it today” flag. Any weekday / time gate is kept; only the once-per-day cap is gone.</div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:1px; background:rgba(142,198,63,.12);">
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev1T">Berry / fruit trees</div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev1B">Refilled every time, instantly. No gate.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev2T">Move Tutor</div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev2B">Teaches a special move on any visit.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev3T">Trainer House</div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev3B">Battle as often as you like; weekday picks the opponent.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev4T">Haircut brothers</div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev4B">Repeat for happiness; weekday picks older vs. younger.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev5T">Buena's Password <span style="font-size:11px; color:#7e9a4f;">· night</span></div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev5B">Grind Blue Card points. Set the clock to night.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev6T">Bargain shop <span style="font-size:11px; color:#7e9a4f;">· Mon AM</span></div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev6B">Set Monday + morning, then buy as much as you want.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev7T">Rival rematch <span style="font-size:11px; color:#7e9a4f;">· Mon/Wed</span></div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev7B">Refight at Indigo for XP/money. Re-enter the map to repeat.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev8T">Kurt's Apricorn balls</div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev8B">Finished instantly, same visit. Hand over more right away.</p></div>
+          <div style="background:#13241b; padding:20px 24px;"><div style="font-weight:600; color:#cfe6a8; font-size:15.5px;" data-i18n="ev9T">Time Capsule</div><p style="margin:6px 0 0; font-size:13.5px; line-height:1.55; color:#a3b29c;" data-i18n="ev9B">Gen-1 trade link any time after meeting Bill, with no day-wait.</p></div>
+        </div>
+      </div>
+
+      <!-- other categories -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; margin-top:18px;">
+        <div style="padding:24px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.14);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#7e9a4f;" data-i18n="cat1Label">ADVANCE THE DAY</div>
+          <h3 style="font-size:17px; margin:12px 0 8px; color:#f1f6ea;" data-i18n="cat1Title">Once-per-day events</h3>
+          <p style="font-size:13.5px; line-height:1.55; color:#a3b29c; margin:0;" data-i18n="cat1Body">Daily-gift NPCs and daily swarms (Dunsparce, Yanma, fishing) keep their normal cadence. Advance the day to use them again or re-roll the swarm.</p>
+        </div>
+        <div style="padding:24px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.14);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#7e9a4f;" data-i18n="cat2Label">SET THE WEEKDAY</div>
+          <h3 style="font-size:17px; margin:12px 0 8px; color:#f1f6ea;" data-i18n="cat2Title">Weekday-locked</h3>
+          <p style="font-size:13.5px; line-height:1.55; color:#a3b29c; margin:0;" data-i18n="cat2Body">Rooftop sale, Lapras on Friday, the bitter-herb merchant, weekly siblings, the Clefairy dance. Set the matching weekday to make them appear.</p>
+        </div>
+        <div style="padding:24px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.14);">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#7e9a4f;" data-i18n="cat3Label">SET THE TIME</div>
+          <h3 style="font-size:17px; margin:12px 0 8px; color:#f1f6ea;" data-i18n="cat3Title">Time-of-day-locked</h3>
+          <p style="font-size:13.5px; line-height:1.55; color:#a3b29c; margin:0;" data-i18n="cat3Body">Daisy's grooming (~3 PM), Buena at night, the bargain shop, and day/night encounters &amp; palettes. Set the time of day to trigger them.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:18px; display:flex; flex-wrap:wrap; align-items:center; gap:8px 28px; padding:28px 30px; border-radius:18px; background:linear-gradient(120deg,#16271e,#13241b); border:1px solid rgba(142,198,63,.28); overflow:hidden;">
+        <div style="flex:1; min-width:300px;">
+          <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#7e9a4f; letter-spacing:.5px;" data-i18n="phoneLabel">DRIVEN BY PLAY TIME</div>
+          <h3 style="font-size:22px; margin:12px 0 10px; color:#f1f6ea; font-family:'Space Grotesk',sans-serif;" data-i18n="phoneTitle">Phone calls run on console time</h3>
+          <p style="font-size:14.5px; line-height:1.65; color:#a9b8a2; margin:0;" data-i18n="phoneBody">Incoming calls (rematch notices, daily-gift reminders, Buena's password) were scheduled by real elapsed clock minutes. With the clock frozen they would never fire, so we re-pointed them at the Game Boy's play-time counter, the odometer that ticks up every frame the console runs. The original timing still applies, so expect roughly 20 minutes of real play time before each call comes in. It is the same countdown Crystal always used, only measured against play time instead of the wall clock.</p>
+        </div>
+        <div style="flex:none; width:172px; align-self:flex-end; margin-bottom:-28px;">
+          <img loading="lazy" src="assets/ethan.png" alt="Ethan checking his Pokégear" style="display:block; width:100%; height:auto; image-rendering:auto; filter:drop-shadow(0 10px 20px rgba(0,0,0,.45));">
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding:26px 30px; border-radius:18px; background:#13241b; border:1px solid rgba(142,198,63,.18);">
+        <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#7e9a4f; letter-spacing:.5px;" data-i18n="phoneHowTitle">HOW THE CALL TIMER WORKS</div>
+        <p style="font-size:14px; line-height:1.65; color:#a9b8a2; margin:12px 0 20px; max-width:780px;" data-i18n="phoneHowIntro">An internal timer ticks only in the overworld, while you walk or stand still, and pauses during battles and text. From the moment a number is registered (or the previous call ends), the game checks on a shrinking schedule, each check a 50% chance to ring:</p>
+        <div style="display:flex; flex-direction:column; gap:10px; max-width:680px;">
+          <div style="display:flex; align-items:baseline; gap:16px;">
+            <span style="flex:none; width:78px; font-family:'Press Start 2P',monospace; font-size:11px; color:#8ec63f;">20 min</span>
+            <span style="font-size:13.5px; line-height:1.5; color:#bcc9b4;" data-i18n="phoneRow1">First check. The game rolls a 50% chance to ring.</span>
+          </div>
+          <div style="height:1px; background:rgba(142,198,63,.1);"></div>
+          <div style="display:flex; align-items:baseline; gap:16px;">
+            <span style="flex:none; width:78px; font-family:'Press Start 2P',monospace; font-size:11px; color:#8ec63f;">30 min</span>
+            <span style="font-size:13.5px; line-height:1.5; color:#bcc9b4;" data-i18n="phoneRow2">Missed? It doesn't make you wait another 20. Ten minutes later, another 50% roll.</span>
+          </div>
+          <div style="height:1px; background:rgba(142,198,63,.1);"></div>
+          <div style="display:flex; align-items:baseline; gap:16px;">
+            <span style="flex:none; width:78px; font-family:'Press Start 2P',monospace; font-size:11px; color:#8ec63f;">35 min</span>
+            <span style="font-size:13.5px; line-height:1.5; color:#bcc9b4;" data-i18n="phoneRow3">Five minutes later, another 50% roll.</span>
+          </div>
+          <div style="height:1px; background:rgba(142,198,63,.1);"></div>
+          <div style="display:flex; align-items:baseline; gap:16px;">
+            <span style="flex:none; width:78px; font-family:'Press Start 2P',monospace; font-size:11px; color:#8ec63f;">38 min+</span>
+            <span style="font-size:13.5px; line-height:1.5; color:#bcc9b4;" data-i18n="phoneRow4">Three minutes later, then every three minutes after that, a fresh 50% roll until a call forces its way through.</span>
+          </div>
+        </div>
+        <p style="font-size:13.5px; line-height:1.6; color:#8ec63f; margin:20px 0 0;" data-i18n="phoneReset">The instant a call connects and resolves, the frame counter clears and the whole loop restarts from the 20-minute delay.</p>
+      </div>
+
+      <p style="font-size:13.5px; line-height:1.6; color:#7e9080; margin-top:20px; max-width:760px;" data-i18n="tradeoffs"><strong style="color:#9fb09a;">A couple of trade-offs:</strong> the Bug-Catching Contest's 20-minute timer no longer ticks down on its own (it just won't time you out), and Shuckie's one-time loan still needs a single day advanced before you can return him.</p>
+    </div>
+  </section>
+
+  <!-- ================= CELEBI CAMEO ================= -->
+  <section id="celebi" style="position:relative; padding:96px 28px; scroll-margin-top:80px; overflow:hidden; background:#0d1812;">
+    <div style="position:absolute; inset:0; background-image:url('assets/hero-art.png'); background-size:cover; background-position:center 60%; opacity:.16;"></div>
+    <div style="position:absolute; inset:0; background:linear-gradient(180deg,#11201a, rgba(13,24,18,.55) 40%, #0d1812);"></div>
+    <div style="position:relative; max-width:1100px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+        <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="celEyebrow">A GUARDIAN OF TIME</span>
+      </div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="celH2">The Celebi cameo</h2>
+      <p style="max-width:740px; font-size:17px; line-height:1.65; color:#c4d1bc; margin-top:18px;" data-i18n="celIntro">A version about <em style="color:#e7eee2;">controlling time</em> deserves a nod to the one Pokémon who travels through it. Timeless tucks a shimmering green visitor into two quiet moments, a little reward for paying attention.</p>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:44px;">
+        <!-- title screen cameo -->
+        <div style="border-radius:18px; overflow:hidden; background:#10241a; border:1.5px solid #8ec63f; box-shadow:0 0 18px rgba(142,198,63,.55), 0 0 44px rgba(142,198,63,.25), 0 20px 50px rgba(0,0,0,.45);">
+          <div style="position:relative; height:240px; background:linear-gradient(180deg,#0a1830 0%, #123a52 55%, #1f6b6b 100%); overflow:hidden;">
+            <!-- water shimmer -->
+            <div style="position:absolute; bottom:0; left:0; right:0; height:70px; background:repeating-linear-gradient(180deg,rgba(255,255,255,.08) 0 2px, transparent 2px 8px);"></div>
+            <!-- celebi -->
+            <div style="position:absolute; top:40px; right:44px; width:104px; height:90px; image-rendering:pixelated; background-image:url('assets/celebi_final.png'); background-size:contain; background-repeat:no-repeat; background-position:center; animation:bob 4s ease-in-out infinite; filter:drop-shadow(0 3px 5px rgba(0,0,0,.6));"></div>
+            <!-- title text -->
+            <div style="position:absolute; bottom:18px; left:20px; font-family:'Press Start 2P',monospace; font-size:11px; color:#f4f7ec; text-shadow:0 2px 0 #1a3a2a;">CRYSTAL LEGACY</div>
+          </div>
+          <div style="padding:22px 24px;">
+            <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#8ec63f; letter-spacing:.5px;" data-i18n="tsLabel">TITLE SCREEN</div>
+            <h3 style="font-size:20px; margin:12px 0 8px; color:#f1f6ea;" data-i18n="tsH3">Floating beside Suicune</h3>
+            <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="tsBody">Celebi now floats over the title screen the whole time, drifting and bobbing beside Suicune as it leaps over the water. <span style="color:#cfe6a8;">(It's also where you hold Down + B to reset the clock.)</span></p>
+            <details style="margin-top:16px; border-top:1px solid rgba(142,198,63,.18); padding-top:14px;">
+              <summary style="cursor:pointer; display:flex; align-items:center; gap:9px; user-select:none;">
+                <span class="spoilerChev" style="font-size:10px; color:#cf6b52;">▶</span>
+                <span style="font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:.5px; color:#cf6b52;">SPOILER</span>
+                <span data-i18n="spoilerHint" style="font-size:12px; color:#7e9080;">click to reveal the cameo</span>
+              </summary>
+              <div style="margin-top:14px;">
+                <img data-src="assets/spoiler-title.gif" alt="Title screen Celebi cameo" style="display:block; width:100%; border-radius:10px; image-rendering:pixelated; background:#000;">
+
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- newbark cutscene cameo -->
+        <div style="border-radius:18px; overflow:hidden; background:#10241a; border:1.5px solid #8ec63f; box-shadow:0 0 18px rgba(142,198,63,.55), 0 0 44px rgba(142,198,63,.25), 0 20px 50px rgba(0,0,0,.45);">
+          <div style="position:relative; height:240px; background:linear-gradient(180deg,#7fb86a 0%, #5a9e54 45%, #3f7d3e 100%); overflow:hidden;">
+            <!-- ground rows -->
+            <div style="position:absolute; bottom:0; left:0; right:0; height:90px; background:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 14px, transparent 14px 30px), linear-gradient(180deg, transparent, rgba(20,50,20,.4));"></div>
+            <!-- shrine art -->
+            <img loading="lazy" src="assets/shrine.jpg" alt="Ilex Forest shrine with Celebi" style="position:absolute; bottom:-6px; left:24px; height:170px; width:auto; mix-blend-mode:multiply; opacity:.92;">
+            <!-- celebi sprite floating -->
+            <div style="position:absolute; top:38px; right:38px; width:100px; height:86px; image-rendering:pixelated; background-image:url('assets/celebi_final.png'); background-size:contain; background-repeat:no-repeat; background-position:center; animation:bob 4s ease-in-out infinite;"></div>
+          </div>
+          <div style="padding:22px 24px;">
+            <div style="font-family:'Press Start 2P',monospace; font-size:9px; color:#8ec63f; letter-spacing:.5px;" data-i18n="nbLabel">NEW BARK TOWN</div>
+            <h3 style="font-size:20px; margin:12px 0 8px; color:#f1f6ea;" data-i18n="nbH3">A gift of time</h3>
+            <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="nbBody">On your first steps out of New Bark Town, Celebi appears and blesses you with command over time itself. From here on the clock is yours to bend. <span style="color:#cfe6a8;">Use your power wisely.</span></p>
+            <details style="margin-top:16px; border-top:1px solid rgba(142,198,63,.18); padding-top:14px;">
+              <summary style="cursor:pointer; display:flex; align-items:center; gap:9px; user-select:none;">
+                <span class="spoilerChev" style="font-size:10px; color:#cf6b52;">▶</span>
+                <span style="font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:.5px; color:#cf6b52;">SPOILER</span>
+                <span data-i18n="spoilerHint" style="font-size:12px; color:#7e9080;">click to reveal the cameo</span>
+              </summary>
+              <div style="margin-top:14px;">
+                <img data-src="assets/spoiler-newbark.gif" alt="New Bark Town Celebi cameo" style="display:block; width:100%; border-radius:10px; image-rendering:pixelated; background:#000;">
+
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+
+      <!-- GB dialogue box flavour -->
+      <div style="margin:34px auto 0; max-width:640px; background:#fff; border-radius:8px; padding:22px 24px; box-shadow:0 0 0 3px #fff, 0 0 0 6px #1c1610, 0 18px 40px rgba(0,0,0,.4); position:relative;">
+        <p style="margin:0; font-family:'Press Start 2P',monospace; font-size:12px; line-height:1.9; color:#1c1610;" data-i18n="dialogue">…A voice on the wind whispers of a Pokémon that crossed time itself.<span style="display:inline-block; margin-left:6px; animation:blink 1s steps(1) infinite; color:#1c1610;">▼</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DOWNLOAD / BUILD ================= -->
+  <section id="download" style="background:linear-gradient(180deg,#0d1812,#0f1c16); padding:90px 28px; scroll-margin-top:80px;">
+    <div style="max-width:1100px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+        <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
+        <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="bdEyebrow">BUILDING &amp; TESTING</span>
+      </div>
+      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bdH2">Build it &amp; verify the cart</h2>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:38px; align-items:start;">
+        <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+          <h3 style="font-size:18px; margin:0 0 14px; color:#f1f6ea;" data-i18n="bdLeftH3">Build with RGBDS 0.5.2</h3>
+          <div style="font-family:'Space Grotesk',monospace; font-size:13.5px; background:#0a1510; border:1px solid rgba(142,198,63,.16); border-radius:10px; padding:16px 18px; color:#cfe6a8; line-height:1.9;">
+            <div><span style="color:#6f8167;">$</span> make</div>
+            <div style="color:#7e9080;"># confirm cart byte $0147 reads 0x1B</div>
+            <div style="color:#e6c07a;">MBC5 + RAM + BATTERY · no RTC</div>
+          </div>
+          <p style="font-size:13.5px; line-height:1.6; color:#a9b8a2; margin:16px 0 0;" data-i18n="bdLeftP">An emulator's cart-info view should report MBC5, RAM + battery, no RTC.</p>
+        </div>
+
+        <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+          <h3 style="font-size:18px; margin:0 0 16px; color:#f1f6ea;" data-i18n="bdRightH3">On-hardware sanity check</h3>
+          <ol style="margin:0; padding:0; list-style:none; counter-reset:step; display:flex; flex-direction:column; gap:12px;">
+            <li style="display:flex; gap:12px; font-size:14px; line-height:1.5; color:#bcc9b4;" data-i18n="step1"><span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">1</span> New game → set time → deposit a Pokémon in <strong style="color:#e7eee2;">Box 8</strong>.</li>
+            <li style="display:flex; gap:12px; font-size:14px; line-height:1.5; color:#bcc9b4;" data-i18n="step2"><span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">2</span> Pick berries, battle, change maps, then save &amp; reload.</li>
+            <li style="display:flex; gap:12px; font-size:14px; line-height:1.5; color:#bcc9b4;" data-i18n="step3"><span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">3</span> Confirm Box 8 is intact &amp; the clock didn't jump. <span style="color:#8ec63f;">(The core fix.)</span></li>
+            <li style="display:flex; gap:12px; font-size:14px; line-height:1.5; color:#bcc9b4;" data-i18n="step4"><span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">4</span> Set night, walk around → still night. Advance a day → events refresh.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:34px;">
+        <a href="https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:12px; background:#8ec63f; color:#10261a; font-weight:700; font-size:16px; text-decoration:none; box-shadow:0 10px 30px rgba(142,198,63,.3);" data-i18n="btnRepo">View the repository ↗</a>
+        <a href="https://github.com/pret/pokecrystal" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:12px; background:rgba(20,38,28,.6); border:1px solid rgba(142,198,63,.3); color:#e7eee2; font-weight:600; font-size:16px; text-decoration:none;" data-i18n="btnInstall">INSTALL.md &amp; pret tools →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer style="background:#0a140f; padding:64px 28px 40px; border-top:1px solid rgba(142,198,63,.14);">
+    <div style="max-width:1100px; margin:0 auto;">
+      <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:36px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:44px; height:38px; background-image:url('assets/celebi_final.png'); background-size:contain; background-repeat:no-repeat; background-position:center; image-rendering:pixelated; filter:drop-shadow(0 0 5px rgba(142,198,63,.95)) drop-shadow(0 0 12px rgba(142,198,63,.6));"></div>
+            <div style="font-family:'Press Start 2P',monospace; font-size:11px; color:#8ec63f;">TIMELESS</div>
+          </div>
+          <p style="font-size:13.5px; line-height:1.65; color:#8a9883; margin:16px 0 0; max-width:340px;" data-i18n="ftDesc">A fork of Pokémon Crystal Legacy that removes the Real-Time Clock and ships as MBC5. The clock becomes a frozen value you set; events are driven by the day counter and your play time.</p>
+        </div>
+        <div>
+          <div style="font-size:12px; color:#5f7059; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;" data-i18n="ftProj">Project</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
+            <a href="https://github.com/cRz-Shadows/Pokemon_Crystal_Legacy" target="_blank" rel="noopener" style="color:#bcc9b4; text-decoration:none;">Crystal Legacy on GitHub</a>
+            <a href="https://github.com/pret/pokecrystal" target="_blank" rel="noopener" style="color:#bcc9b4; text-decoration:none;">pret / pokecrystal</a>
+            <a href="https://pret.github.io/" target="_blank" rel="noopener" style="color:#bcc9b4; text-decoration:none;">pret projects</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px; color:#5f7059; text-transform:uppercase; letter-spacing:1px; margin-bottom:14px;" data-i18n="ftComm">Community</div>
+          <div style="display:flex; flex-direction:column; gap:10px; font-size:14px;">
+            <a href="https://www.youtube.com/@smithplayspokemon" target="_blank" rel="noopener" style="color:#bcc9b4; text-decoration:none;">TheSmithPlays · YouTube</a>
+            <a href="https://discord.gg/Wupx8tHRVS" target="_blank" rel="noopener" style="color:#bcc9b4; text-decoration:none;">Discord</a>
+            <a href="https://twitter.com/TheSmithPlays" target="_blank" rel="noopener" style="color:#bcc9b4; text-decoration:none;">Twitter / X</a>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:40px; padding-top:24px; border-top:1px solid rgba(142,198,63,.1);">
+        <div style="display:flex; flex-wrap:wrap; gap:18px; justify-content:space-between; align-items:flex-start;">
+          <div style="font-size:13px; color:#7a8a74;" data-i18n="ftCredit">
+            Original hack by <strong style="color:#a9b8a2;">TheSmithPlays</strong> &amp; <strong style="color:#a9b8a2;">cRz Shadows</strong>. Built on the Pokémon Crystal disassembly by <strong style="color:#a9b8a2;">pret</strong>.
+          </div>
+          <div style="font-size:13px; color:#7a8a74;" data-i18n="ftMade">Made with care by the fan community.</div>
+        </div>
+        <p style="margin:22px 0 0; font-size:11.5px; line-height:1.7; color:#5e6e58; max-width:880px;" data-i18n="ftLegal">This is a free, non-profit, fan-made project. Pokémon, Crystal, Game Boy Color, Celebi, and all related names and characters are trademarks of Nintendo, Game Freak and The Pokémon Company. This project is not affiliated with, endorsed by, or associated with any of them. No copyrighted ROM is distributed. The patch is applied to a copy of the game you already own. All artwork belongs to its respective creators.</p>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  var root = document.getElementById('i18nRoot');
+  var btn  = document.getElementById('langBtn');
+  var hint = document.getElementById('langHint');
+  var lang = 'en';
+  var en = {};
+
+  // Portuguese strings, ported verbatim from the design.
+  const pt = {
+    navBug: `O Bug`,
+    navClock: `O Relógio`,
+    navEvents: `Eventos`,
+    heroVersion: `VERSÃO`,
+    heroTag: `Capture ainda mais, <strong style="color:#f1f6ea;">agora sem relógio.</strong> Um fork de Crystal Legacy que remove toda dependência do Real-Time Clock e roda como cartucho <strong style="color:#b6d98f;">MBC5</strong>, funcionando com segurança em flash carts, núcleos FPGA e emuladores, <em style="color:#e7eee2;">sem corromper o seu save.</em>`,
+    btnDownload: `▶ Baixar o patch`,
+    btnWhy: `Porque o patch existe →`,
+    introEyebrow: `UM FORK DE CRYSTAL LEGACY`,
+    introPara: `O Crystal original marca o tempo com um chip de relógio com bateria. Em hardware que não tem um, essas leituras silenciosamente <strong style="font-weight:600; color:#f1f6ea;">sobrescrevem os seus Pokémon salvos.</strong> A Timeless remove o relógio por completo e devolve o tempo às <strong style="font-weight:600; color:#8ec63f;">suas mãos</strong>.`,
+    stat1: `Leituras e escritas no RTC`,
+    stat2: `Formato do save intacto`,
+    stat3: `Controle sobre o tempo`,
+    bugEyebrow: `POR QUE ESTE FORK EXISTE`,
+    bugH2: `O relógio que devorou a Box 8`,
+    bugIntro: `O Crystal original usa um mapeador <strong style="color:#e7eee2;">MBC3</strong> com um Real-Time Clock alimentado por bateria. O jogo marca o tempo conversando com esse chip. Em hardware <strong style="color:#e7eee2;">sem um RTC de verdade</strong>, essas conversas não devolvem lixo. Elas silenciosamente sobrescrevem o seu <strong style="color:#e89a86;">jogo salvo</strong>.`,
+    bugC1T: `Um registrador com função dupla`,
+    bugC1B: `No MBC3, escrever em <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">$4000</code> seleciona um banco de SRAM (<code style="color:#e6c07a;">$00–$03</code>) <em>ou</em> um registrador do RTC (<code style="color:#e6c07a;">$08–$0C</code>). Mesmo endereço, dois papéis.`,
+    bugC2T: `Sem relógio, sem modo de relógio`,
+    bugC2B: `Sem RTC, o mapeador não tem o modo <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">$08–$0C</code>. O seletor de dia-baixo <code style="color:#e6c07a;">$0B</code> é tratado como o banco de SRAM 3, que neste layout de save começa exatamente na <strong style="color:#e89a86;">Box 8</strong>.`,
+    bugC3T: `Leituras e escritas corrompem`,
+    bugC3B: `<strong style="color:#e7eee2;">Escrever</strong> o relógio grava bytes de tempo por cima da Box 8. <strong style="color:#e7eee2;">Ler</strong> carrega os bytes da box <em>como se fossem a hora atual</em>, então o relógio salta sozinho sempre que você colhe berries, batalha ou abre o Pokégear.`,
+    bugWarn: `Pior: a contagem de dias corrompida costuma indicar “&gt;140 dias passados”, então o código de correção chama <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">SetClock</code> para “corrigir”, causando <strong style="color:#f1ddd6;">mais escritas, mais corrupção.</strong> É esse o bug por trás de “a Box 8 vive sendo apagada” e “o relógio muda sozinho”.`,
+    fixLabel: `A CORREÇÃO`,
+    fixTitle: `Publicar como MBC5`,
+    fixBody: `Se o jogo nunca toca no RTC, ele nunca precisa do hardware de relógio. O MBC5 é um superconjunto estrito do <em>banking</em> do MBC3 (mesmos seletores de SRAM, mesmo banking de ROM), mas <strong style="color:#b6d98f;">não tem RTC nem o modo <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">$08–$0C</code></strong>. Mesmo que uma escrita de relógio escape, não há onde ela virar relógio. O caminho da corrupção simplesmente não pode ser reativado.`,
+    saveFmtLabel: `FORMATO DO SAVE`,
+    saveFmtVal: `Idêntico. Layout das boxes, SRAM de 32 KB &amp; bateria, tudo inalterado.`,
+    yourSavLabel: `SEU .SAV`,
+    yourSavVal: `Saves existentes funcionam como estão. Sem patch de bytes.`,
+    hwLabel: `HARDWARE`,
+    hwVal: `Flash carts, núcleos FPGA &amp; emuladores, todos verificados.`,
+    clockEyebrow: `CONTROLE O TEMPO VOCÊ MESMO`,
+    clockH2: `Um relógio congelado sob seu controle`,
+    clockIntro: `Sem o RTC, o tempo é um <strong style="color:#e7eee2;">valor de software que você define</strong> e que nunca avança sozinho. Coloque o tempo à noite e <em>grinde</em> por uma hora: continua noite. As paletas de dia e noite permanecem funcionando perfeitamente.`,
+    todTitle: `Hora do dia`,
+    todBody: `Manhã / Dia / Noite. Define encontros selvagens &amp; paletas, e NPCs travados por horário, como a Daisy às 15h, a Buena à noite e a loja de ofertas pela manhã.`,
+    wdTitle: `Dia da semana`,
+    wdBody: `Seg–Dom. Define todo evento travado por dia da semana, da Lapras na sexta à promoção da cobertura, os NPCs irmãos semanais e qual irmão do corte de cabelo está.`,
+    dcTitle: `Contador de dias`,
+    dcBody: `Avance o dia para disparar o reset diário, renovando todos os eventos diários de uma vez. O jeito mais fácil de “esperar um dia” de qualquer lugar.`,
+    entryH3: `Três formas de abrir a tela do relógio`,
+    entrySub: `As três gravam os mesmos offsets, então use a que for mais conveniente.`,
+    optAName: `Novo Jogo`,
+    optABody: `O prompt normal de “acertar a hora” no começo do jogo.`,
+    optBName: `Reset na tela de título`,
+    optBBody: `Segure <strong style="color:#cfe6a8;">Baixo + B</strong> na tela de título (Suicune saltando) para reabrir o reset de relógio original.`,
+    newBadge: `NOVO`,
+    optCName: `Atalho no Pokégear`,
+    optCBody: `No cartão <strong style="color:#cfe6a8;">Relógio</strong> do Pokégear, segure <strong style="color:#cfe6a8;">SELECT + CIMA</strong>. Ajuste o tempo no meio da rota sem voltar ao título.`,
+    noWait: `<strong style="color:#eaf3d8;">Sem mais espera.</strong> Esta versão entrega as antigas recompensas travadas por dia na hora, então você quase nunca precisa avançar o dia. A única exceção é a <strong style="color:#cfe6a8;">GS Ball do Kurt</strong>: entregue-a e avance um dia na tela do relógio para acionar o evento de encontrar o Celebi na Ilex Forest (vai mover o Kurt para fora de sua casa, fluxo normal do evento).`,
+    clockTip: `<strong style="color:#f0e6cf;">Prefira avançar o tempo.</strong> O reset diário é disparado pela <em>virada</em> do dia, não por hoje ser uma data maior. Se você voltar o relógio para antes da meia-noite, algumas flags diárias ficam em “já feito hoje” até você avançar por uma meia-noite de novo.`,
+    evEyebrow: `EVENTOS BASEADOS NO TEMPO`,
+    evH2: `Nada removido, só passou a depender de você`,
+    evIntro: `Quase todo evento diário/semanal usa o contador de dias, não o chip de relógio, então todos continuam funcionando. Eles só avançam quando você move o relógio. Uma categoria ficou <strong style="color:#8ec63f;">melhor</strong>:`,
+    alwaysTitle: `Sempre disponível: limite diário removido`,
+    alwaysSub: `Esses benefícios repetíveis não rastreiam mais a flag de “já fiz hoje”. Qualquer trava de dia ou horário é mantida; só o limite de uma vez por dia sumiu.`,
+    ev1T: `Árvores de berry / frutas`,
+    ev1B: `Reabastecem toda vez, na hora. Sem trava.`,
+    ev2T: `Move Tutor`,
+    ev2B: `Ensina um golpe especial em qualquer visita.`,
+    ev3T: `Casa de Treinadores`,
+    ev3B: `Batalhe quantas vezes quiser; o dia da semana define o oponente.`,
+    ev4T: `Irmãos do corte de cabelo`,
+    ev4B: `Repita para subir felicidade; o dia define o irmão mais velho ou o mais novo.`,
+    ev5T: `Senha da Buena <span style="font-size:11px; color:#7e9a4f;">· noite</span>`,
+    ev5B: `Grinde pontos do Blue Card. Ponha o relógio à noite.`,
+    ev6T: `Loja de ofertas <span style="font-size:11px; color:#7e9a4f;">· seg manhã</span>`,
+    ev6B: `Defina segunda + manhã e compre o quanto quiser.`,
+    ev7T: `Revanche do rival <span style="font-size:11px; color:#7e9a4f;">· seg/qua</span>`,
+    ev7B: `Reduele no Indigo por XP/dinheiro. Reentre no mapa para repetir.`,
+    ev8T: `Pokébolas de Apricorn do Kurt`,
+    ev8B: `Prontas na hora, na mesma visita. Entregue mais já.`,
+    ev9T: `Time Capsule`,
+    ev9B: `Troca com a Gen 1 a qualquer hora após conhecer o Bill, sem esperar um dia.`,
+    cat1Label: `AVANCE O DIA`,
+    cat1Title: `Eventos de uma vez por dia`,
+    cat1Body: `NPCs de presente diário e swarms diários (Dunsparce, Yanma, pesca) mantêm o ritmo normal. Avance o dia para usar de novo ou re-sortear o swarm.`,
+    cat2Label: `DEFINA O DIA DA SEMANA`,
+    cat2Title: `Travados por dia da semana`,
+    cat2Body: `Promoção da cobertura, Lapras na sexta, o vendedor de ervas amargas, os irmãos semanais, a dança dos Clefairy. Defina o dia certo para fazê-los aparecer.`,
+    cat3Label: `DEFINA A HORA`,
+    cat3Title: `Travados por hora do dia`,
+    cat3Body: `Tosa da Daisy (~15h), Buena à noite, a loja de ofertas e encontros/paletas de dia e noite. Defina a hora do dia para dispará-los.`,
+    tradeoffs: `<strong style="color:#9fb09a;">Algumas contrapartidas:</strong> o cronômetro de 20 minutos do Concurso de Captura de Insetos não corre mais sozinho (só não te expulsa por tempo), e o empréstimo único do Shuckie ainda precisa de um dia avançado antes de devolvê-lo.`,
+    phoneLabel: `GUIADO PELO TEMPO DE JOGO`,
+    phoneTitle: `Ligações usam o tempo do console`,
+    phoneBody: `Ligações recebidas (avisos de revanche, lembretes de presente diário, senha da Buena) eram agendadas por minutos reais do relógio. Com o relógio congelado, elas nunca disparariam, então as reapontamos para o contador de tempo de jogo do Game Boy, o hodômetro que avança a cada frame que o console roda. A contagem original continua valendo, então espere cerca de 20 minutos de tempo real de jogo até cada ligação chegar. É a mesma contagem que o Crystal sempre usou, só que medida pelo tempo de jogo em vez do relógio de parede.`,
+    phoneHowTitle: `COMO FUNCIONA O TIMER DAS LIGAÇÕES`,
+    phoneHowIntro: `Um timer interno só corre no overworld, enquanto você anda ou fica parado, e pausa em batalhas e diálogos. A partir do momento em que um número é registrado (ou a ligação anterior termina), o jogo verifica numa escala decrescente, cada verificação com 50% de chance de tocar:`,
+    phoneRow1: `Primeira verificação. O jogo sorteia 50% de chance de tocar.`,
+    phoneRow2: `Falhou? Ele não te faz esperar mais 20. Dez minutos depois, outro sorteio de 50%.`,
+    phoneRow3: `Cinco minutos depois, outro sorteio de 50%.`,
+    phoneRow4: `Três minutos depois e, a partir daí, a cada três minutos, um novo sorteio de 50% até uma ligação passar.`,
+    phoneReset: `Assim que uma ligação cai e se resolve, o contador de frames zera e todo o ciclo recomeça pelo atraso de 20 minutos.`,
+    celEyebrow: `UM GUARDIÃO DO TEMPO`,
+    celH2: `A participação de Celebi`,
+    celIntro: `Uma versão sobre <em style="color:#e7eee2;">controlar o tempo</em> merece um aceno ao único Pokémon que viaja por ele. A Timeless esconde um visitante verde e cintilante em dois momentos discretos, uma pequena recompensa para quem presta atenção.`,
+    spoilerHint: `clique para revelar a cena`,
+    tsLabel: `TELA DE TÍTULO`,
+    tsH3: `Flutuando com o Suicune`,
+    tsBody: `Agora o Celebi fica o tempo todo na tela de título, flutuando e balançando ao lado do Suicune enquanto ele salta sobre a água. <span style="color:#cfe6a8;">(É também onde você segura Baixo + B para resetar o relógio.)</span>`,
+    nbLabel: `CIDADE FOLHA NOVA`,
+    nbH3: `Um presente do tempo`,
+    nbBody: `Nos seus primeiros passos para fora de Cidade Folha Nova, Celebi aparece e te abençoa com o domínio sobre o próprio tempo. A partir daqui, o relógio é seu para moldar. <span style="color:#cfe6a8;">Use seu poder com sabedoria.</span>`,
+    dialogue: `…Uma voz no vento sussurra sobre um Pokémon que atravessou o próprio tempo.<span style="display:inline-block; margin-left:6px; animation:blink 1s steps(1) infinite; color:#1c1610;">▼</span>`,
+    bdEyebrow: `COMPILANDO &amp; TESTANDO`,
+    bdH2: `Compile &amp; verifique o cartucho`,
+    bdLeftH3: `Compile com RGBDS 0.5.2`,
+    bdLeftP: `A tela de info do cartucho do emulador deve mostrar MBC5, RAM + bateria, sem RTC.`,
+    bdRightH3: `Teste de sanidade no hardware`,
+    step1: `<span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">1</span> Novo jogo → acerte a hora → deposite um Pokémon na <strong style="color:#e7eee2;">Box 8</strong>.`,
+    step2: `<span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">2</span> Colha berries, batalhe, troque de mapa, depois salve &amp; recarregue.`,
+    step3: `<span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">3</span> Confirme que a Box 8 está intacta &amp; o relógio não pulou. <span style="color:#8ec63f;">(A correção principal.)</span>`,
+    step4: `<span style="flex:none; width:22px; height:22px; border-radius:6px; background:#8ec63f; color:#10261a; font-weight:700; font-size:12px; display:grid; place-items:center;">4</span> Ponha noite, ande por aí → ainda noite. Avance um dia → eventos renovam.`,
+    btnRepo: `Ver o repositório ↗`,
+    btnInstall: `INSTALL.md &amp; ferramentas pret →`,
+    ftDesc: `Um fork de Pokémon Crystal Legacy que remove o Real-Time Clock e roda como MBC5. O relógio vira um valor congelado que você define; os eventos passam a depender do contador de dias e do seu tempo de jogo.`,
+    ftProj: `Projeto`,
+    ftComm: `Comunidade`,
+    ftCredit: `Hack original por <strong style="color:#a9b8a2;">TheSmithPlays</strong> &amp; <strong style="color:#a9b8a2;">cRz Shadows</strong>. Construído sobre o disassembly de Pokémon Crystal pela <strong style="color:#a9b8a2;">pret</strong>.`,
+    ftMade: `Feito com carinho pela comunidade de fãs.`,
+    ftLegal: `Este é um projeto de fã, gratuito e sem fins lucrativos. Pokémon, Crystal, Game Boy Color, Celebi e todos os nomes e personagens relacionados são marcas da Nintendo, Game Freak e The Pokémon Company. Este projeto não é afiliado, endossado ou associado a nenhuma delas. Nenhuma ROM protegida por direitos autorais é distribuída. O patch é aplicado a uma cópia do jogo que você já possui. Toda a arte pertence aos seus respectivos criadores.`,
+  };
+
+  function collectEn() {
+    if (!root) return;
+    root.querySelectorAll('[data-i18n]').forEach(function (n) {
+      var k = n.getAttribute('data-i18n');
+      if (!(k in en)) en[k] = n.innerHTML;
+    });
+  }
+
+  function apply() {
+    if (!root) return;
+    collectEn();
+    var T = lang === 'pt' ? pt : null;
+    root.querySelectorAll('[data-i18n]').forEach(function (n) {
+      var k = n.getAttribute('data-i18n');
+      n.innerHTML = (T && T[k] != null) ? T[k] : en[k];
+    });
+    if (btn) btn.textContent = lang === 'pt' ? 'EN' : 'PT';
+  }
+
+  window.toggleLang = function () {
+    lang = lang === 'en' ? 'pt' : 'en';
+    apply();
+  };
+
+  // Celebi peeks in, points at the language toggle, then vanishes.
+  function showLangHint() {
+    var h = hint, b = btn;
+    if (!h || !b) return;
+    h.style.left = '0px';
+    h.style.top = '0px';
+    h.style.display = 'block';
+    try {
+      var nav = b.closest('nav');
+      var nr = nav.getBoundingClientRect();
+      h.style.top = (nr.height - 6) + 'px';
+      var tail = h.querySelector('[data-tail]') || b;
+      var tr = tail.getBoundingClientRect(), br = b.getBoundingClientRect();
+      var delta = (br.left + br.width / 2) - (tr.left + tr.width / 2);
+      h.style.left = delta + 'px';
+    } catch (e) {}
+    void h.offsetWidth;
+    h.style.animation = 'langPeek 5s ease forwards';
+    var done = function () { h.style.display = 'none'; h.removeEventListener('animationend', done); };
+    h.addEventListener('animationend', done);
+  }
+
+  // Heavy spoiler GIFs (~5.9 MB) load and play only when their <details>
+  // is opened; closing clears the src so a re-open restarts the animation.
+  function wireSpoilers() {
+    document.querySelectorAll('details').forEach(function (d) {
+      var img = d.querySelector('img[data-src]');
+      if (!img) return;
+      d.addEventListener('toggle', function () {
+        if (d.open) img.src = img.dataset.src;
+        else img.removeAttribute('src');
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    collectEn();
+    wireSpoilers();
+    setTimeout(showLangHint, 1000);
+  });
+})();
+</script>
+</body>
+</html>
