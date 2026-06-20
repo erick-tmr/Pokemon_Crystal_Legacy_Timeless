@@ -1062,6 +1062,7 @@ RunTitleScreen:
 	jr nz, .done_title
 	call TitleScreenScene
 	farcall SuicuneFrameIterator
+	farcall AnimateTitleCelebi
 	call DelayFrame
 	and a
 	ret

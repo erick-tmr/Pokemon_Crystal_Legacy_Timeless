@@ -1,3 +1,10 @@
+; Celebi flies across the title screen in front of the running Suicune.
+CELEBI_GFX_TILE EQU 60   ; first sprite tile id: just past the 60 crystal tiles in vTiles0
+CELEBI_START_X  EQU 168  ; OAM x: off the right edge of the screen
+CELEBI_HOVER_X  EQU 28   ; OAM x: hover ahead of (to the left of) the leftward-running Suicune
+CELEBI_BASE_Y   EQU 108  ; OAM y: base hover height, level with Suicune's head
+CELEBI_OAM_ATTR EQU 1    ; OBJ palette 1, drawn in front of the background
+
 _TitleScreen:
 	call ClearBGPalettes
 	call ClearSprites
@@ -123,6 +130,11 @@ _TitleScreen:
 	ld de, vTiles0
 	call Decompress
 
+; Decompress Celebi into the free vTiles0 space right after the crystal
+	ld hl, TitleCelebiGFX
+	ld de, vTiles0 + CELEBI_GFX_TILE tiles
+	call Decompress
+
 ; Clear screen tiles
 	hlbgcoord 0, 0
 	ld bc, 64 * BG_MAP_WIDTH
@@ -245,6 +257,12 @@ _TitleScreen:
 
 	xor a
 	ld [wSuicuneFrame], a
+
+; Start Celebi off-screen to the right, ready to fly in
+	ld a, CELEBI_START_X
+	ld [wCelebiX], a
+	xor a
+	ld [wCelebiBob], a
 
 ; Play starting sound effect
 	call SFXChannelsOff
@@ -400,6 +418,70 @@ endr
 
 	ret
 
+AnimateTitleCelebi:
+; Fly Celebi in from the right edge, then have it hover and gently bob up and
+; down in front of the running Suicune. Uses virtual OAM sprites 30-35.
+
+; Advance x toward the hover position
+	ld a, [wCelebiX]
+	cp CELEBI_HOVER_X
+	jr z, .hovering
+	dec a
+	ld [wCelebiX], a
+.hovering
+	ld b, a ; base x
+
+; Advance the bob timer and look up the current vertical offset
+	ld a, [wCelebiBob]
+	inc a
+	ld [wCelebiBob], a
+	srl a
+	srl a ; one step every 4 frames
+	and %1111
+	ld e, a
+	ld d, 0
+	ld hl, .BobTable
+	add hl, de
+	ld a, [hl]
+	add CELEBI_BASE_Y
+	ld c, a ; base y
+
+; Write the six 8x16 sprites that make up Celebi
+	ld hl, wVirtualOAMSprite30
+	ld de, .Sprites
+	ld a, 6
+.loop
+	push af
+	ld a, [de] ; dy
+	add c
+	ld [hli], a ; y
+	inc de
+	ld a, [de] ; dx
+	add b
+	ld [hli], a ; x
+	inc de
+	ld a, [de] ; tile
+	ld [hli], a ; tile id
+	inc de
+	ld a, CELEBI_OAM_ATTR
+	ld [hli], a ; attributes
+	pop af
+	dec a
+	jr nz, .loop
+	ret
+
+.Sprites:
+	;  dy, dx, tile
+	db  0,  0, CELEBI_GFX_TILE + 0
+	db  0,  8, CELEBI_GFX_TILE + 2
+	db  0, 16, CELEBI_GFX_TILE + 4
+	db 16,  0, CELEBI_GFX_TILE + 6
+	db 16,  8, CELEBI_GFX_TILE + 8
+	db 16, 16, CELEBI_GFX_TILE + 10
+
+.BobTable:
+	db 0, 1, 2, 3, 3, 3, 2, 1, 0, -1, -2, -3, -3, -3, -2, -1
+
 TitleSuicuneGFX:
 INCBIN "gfx/title/suicune.2bpp.lz"
 
@@ -408,6 +490,9 @@ INCBIN "gfx/title/logo.2bpp.lz"
 
 TitleCrystalGFX:
 INCBIN "gfx/title/crystal.2bpp.lz"
+
+TitleCelebiGFX:
+INCBIN "gfx/title/celebi.2bpp.lz"
 
 TitleScreenPalettes:
 INCLUDE "gfx/title/title.pal"
