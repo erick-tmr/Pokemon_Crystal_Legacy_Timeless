@@ -2045,6 +2045,10 @@ wTempRestorePPItem::
 wApricorns::
 wSuicuneFrame::
 	db
+wCelebiX:: ; title screen Celebi: current OAM x (fly-in position)
+	db
+wCelebiBob:: ; title screen Celebi: vertical bob timer
+	db
 
 
 SECTION UNION "Miscellaneous WRAM 1", WRAMX
