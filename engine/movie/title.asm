@@ -148,7 +148,7 @@ _TitleScreen:
 	ld e, 20
 	call DrawTitleGraphic
 
-; Draw copyright text (16 tiles wide for "©2026 SPP & ETM V1.0.0", centered)
+; Draw copyright text (16 tiles wide for "©2026 SPP & ETM V1.1.0", centered)
 	hlbgcoord 2, 0, vBGMap1
 	lb bc, 1, 16
 	ld d, $c
