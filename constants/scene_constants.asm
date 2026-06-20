@@ -10,6 +10,11 @@ SCENE_FINISHED EQU 1
 ; scene variable value.
 SCENE_ALWAYS   EQU -1
 
+; wNewBarkTownSceneID
+	const_def
+	const SCENE_NEWBARKTOWN_NOTHING     ; 0
+	const SCENE_NEWBARKTOWN_MEET_CELEBI ; 1
+
 ; wPokecenter2FSceneID
 	const_def 1
 	const SCENE_POKECENTER2F_LEAVE_TRADE_CENTER       ; 1

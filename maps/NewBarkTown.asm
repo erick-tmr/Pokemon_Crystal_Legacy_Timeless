@@ -2,14 +2,16 @@
 	const NEWBARKTOWN_TEACHER
 	const NEWBARKTOWN_FISHER
 	const NEWBARKTOWN_SILVER
+	const NEWBARKTOWN_CELEBI
 
 NewBarkTown_MapScripts:
 	def_scene_scripts
-	scene_script .DummyScene0 ; SCENE_DEFAULT
-	scene_script .DummyScene1 ; SCENE_FINISHED
+	scene_script .DummyScene0 ; SCENE_NEWBARKTOWN_NOTHING
+	scene_script .DummyScene1 ; SCENE_NEWBARKTOWN_MEET_CELEBI
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, .FlyPoint
+	callback MAPCALLBACK_OBJECTS, .HideCelebi
 
 .DummyScene0:
 	end
@@ -20,6 +22,13 @@ NewBarkTown_MapScripts:
 .FlyPoint:
 	setflag ENGINE_FLYPOINT_NEW_BARK
 	clearevent EVENT_FIRST_TIME_BANKING_WITH_MOM
+	endcallback
+
+; Celebi is only ever shown by the intro cutscene (via appear). Keep it hidden
+; by default on every map load so it can't linger as a stray object -- this also
+; covers save files made before the cutscene existed, where its flag is clear.
+.HideCelebi:
+	setevent EVENT_NEW_BARK_TOWN_CELEBI
 	endcallback
 
 NewBarkTown_TeacherStopsYouScene1:
@@ -125,6 +134,48 @@ NewBarkTownSilverScript:
 	applymovement NEWBARKTOWN_SILVER, NewBarkTown_SilverReturnsToTheShadowsMovement
 	end
 
+NewBarkTownCelebiScene:
+	special FadeOutMusic
+	pause 20
+	appear NEWBARKTOWN_CELEBI
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatDown
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatLeft
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatDown
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatDown
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatRight
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatRight
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatDown
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatDown
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatDown
+	playsound SFX_FLY
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiFloatLeft
+	turnobject NEWBARKTOWN_CELEBI, UP
+	pause 10
+	turnobject PLAYER, DOWN
+	showemote EMOTE_SHOCK, PLAYER, 20
+	pause 20
+	opentext
+	writetext CelebiSceneText
+	waitbutton
+	closetext
+	pause 20
+	playsound SFX_WARP_TO
+	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiTeleportsAwayMovement
+	disappear NEWBARKTOWN_CELEBI
+	waitsfx
+	setscene SCENE_NEWBARKTOWN_NOTHING
+	special RestartMapMusic
+	end
+
 NewBarkTownSign:
 	jumptext NewBarkTownSignText
 
@@ -184,6 +235,28 @@ NewBarkTown_SilverShovesYouOutMovement:
 
 NewBarkTown_SilverReturnsToTheShadowsMovement:
 	step RIGHT
+	step_end
+
+NewBarkTown_CelebiFloatDown:
+	slow_step DOWN
+	step_end
+
+NewBarkTown_CelebiFloatLeft:
+	slow_step LEFT
+	step_end
+
+NewBarkTown_CelebiFloatRight:
+	slow_step RIGHT
+	step_end
+
+NewBarkTown_CelebiTeleportsAwayMovement:
+	fast_slide_step UP
+	fast_slide_step UP
+	fast_slide_step UP
+	fast_slide_step UP
+	fast_slide_step UP
+	fast_slide_step UP
+	fast_slide_step UP
 	step_end
 
 Text_GearIsImpressive:
@@ -259,6 +332,66 @@ NewBarkTownRivalText2:
 	line "staring at?"
 	done
 
+CelebiSceneText:
+	text "(…)"
+
+	para "(…………………)"
+
+	para "(A gentle, warm"
+	line "light envelops"
+	cont "your mind…)"
+
+	para "(…Human…)"
+	line "(…Hear my voice…)"
+
+	para "(I am the"
+	line "guardian of the"
+	cont "temporal flows.)"
+
+	para "(I have watched"
+	line "your bond with"
+	cont "#MON across"
+	cont "the eras.)"
+
+	para "(The threads of"
+	line "time are"
+	cont "delicate, yet"
+	cont "I sense a great"
+	cont "purpose within"
+	cont "your heart.)"
+
+	para "(I shall grant"
+	line "you a fragment"
+	cont "of my blessing…)"
+
+	para "(Look upon your"
+	line "#GEAR. It has"
+	cont "been touched by"
+	cont "the eternal"
+	cont "winds of time.)"
+
+	para "(You now hold"
+	line "the power to"
+	cont "shift the hours,"
+	cont "to command the"
+	cont "sun and the moon"
+	cont "at your will.)"
+
+	para "(But remember…"
+	line "time is a river.)"
+
+	para "(Use this gift"
+	line "with wisdom"
+	cont "and respect.)"
+
+	para "(…………………)"
+
+	para "(The voice fades"
+	line "away, leaving a"
+	cont "lingering"
+	cont "warmth…)"
+	done
+
 NewBarkTownSignText:
 	text "NEW BARK TOWN"
 
@@ -291,6 +424,7 @@ NewBarkTown_MapEvents:
 	def_coord_events
 	coord_event  1,  8, SCENE_DEFAULT, NewBarkTown_TeacherStopsYouScene1
 	coord_event  1,  9, SCENE_DEFAULT, NewBarkTown_TeacherStopsYouScene2
+	coord_event 13,  6, SCENE_NEWBARKTOWN_MEET_CELEBI, NewBarkTownCelebiScene
 
 	def_bg_events
 	bg_event  8,  8, BGEVENT_READ, NewBarkTownSign
@@ -302,3 +436,4 @@ NewBarkTown_MapEvents:
 	object_event  6,  8, SPRITE_TEACHER, SPRITEMOVEDATA_SPINRANDOM_SLOW, 1, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, NewBarkTownTeacherScript, -1
 	object_event 12,  9, SPRITE_FISHER, SPRITEMOVEDATA_WALK_UP_DOWN, 0, 1, -1, -1, PAL_NPC_GREEN, OBJECTTYPE_SCRIPT, 0, NewBarkTownFisherScript, -1
 	object_event  3,  2, SPRITE_SILVER, SPRITEMOVEDATA_STANDING_RIGHT, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, NewBarkTownSilverScript, EVENT_RIVAL_NEW_BARK_TOWN
+	object_event 13,  1, SPRITE_CELEBI, SPRITEMOVEDATA_STILL, 0, 0, -1, -1, 0, OBJECTTYPE_SCRIPT, 0, ObjectEvent, EVENT_NEW_BARK_TOWN_CELEBI

@@ -1473,5 +1473,7 @@
 	const EVENT_ROUTE_24_MEW
 	const EVENT_ROUTE_24_MEW_CAUGHT
 
+	const EVENT_NEW_BARK_TOWN_CELEBI
+
 	const_next 2048
 NUM_EVENTS EQU const_value ; 800
