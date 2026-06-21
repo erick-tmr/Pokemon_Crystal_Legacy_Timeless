@@ -1,0 +1,8 @@
+# Showcase site assets are binary — never apply text/EOL normalization,
+# which would corrupt them (the repo root .gitattributes only covers *.png).
+*.png binary
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
