@@ -1,5 +1,11 @@
 # Crystal Legacy Timeless
 
+### 🌐 [**Check out the Timeless website →**](https://erick-tmr.github.io/Pokemon_Crystal_Legacy_Timeless/)
+
+New here? The website is an illustrated walkthrough of the RTC save-corruption bug, the clock you
+now control, and how the time-based events work — in **English & Português**. Start there for the
+full explanation, then dive into the docs below.
+
 > **Crystal Legacy Timeless** is a fork of [Pokémon Crystal Legacy](https://github.com/cRz-Shadows/Pokemon_Crystal_Legacy)
 > that removes all dependence on the cartridge Real-Time Clock (RTC) and ships as an **MBC5**
 > cart, so it runs safely on RTC-less hardware (FPGA cores, flash carts, emulators) without
