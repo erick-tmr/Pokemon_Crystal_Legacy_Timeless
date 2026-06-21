@@ -37,6 +37,21 @@
   summary::-webkit-details-marker { display: none; }
   .spoilerChev { transition: transform .2s ease; }
   details[open] .spoilerChev { transform: rotate(90deg); }
+
+  /* ---------- tablet ---------- */
+  @media (max-width: 900px) {
+    [data-grid2], [data-footer-grid] { grid-template-columns: 1fr 1fr !important; }
+  }
+  /* ---------- phone ---------- */
+  @media (max-width: 680px) {
+    nav { padding-left: 16px !important; padding-right: 16px !important; gap: 12px !important; }
+    [data-navlink] { display: none !important; }
+    header, section, footer { padding-left: 18px !important; padding-right: 18px !important; }
+    header { min-height: 0 !important; padding-top: 44px !important; padding-bottom: 52px !important; }
+    section, [id="download"] { padding-top: 56px !important; padding-bottom: 56px !important; }
+    [data-hero-grid], [data-grid2], [data-footer-grid] { grid-template-columns: 1fr !important; gap: 28px !important; }
+    [data-hero-card] { max-width: 70vw !important; }
+  }
 </style>
 </head>
 <body>
@@ -52,10 +67,10 @@
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:26px; font-size:14px; font-weight:500;">
-      <a href="#bug" style="color:#c5d2bd; text-decoration:none;" data-i18n="navBug">The Bug</a>
-      <a href="#clock" style="color:#c5d2bd; text-decoration:none;" data-i18n="navClock">The Clock</a>
-      <a href="#events" style="color:#c5d2bd; text-decoration:none;" data-i18n="navEvents">Events</a>
-      <a href="#celebi" style="color:#c5d2bd; text-decoration:none;">Celebi</a>
+      <a href="#bug" data-navlink style="color:#c5d2bd; text-decoration:none;" data-i18n="navBug">The Bug</a>
+      <a href="#clock" data-navlink style="color:#c5d2bd; text-decoration:none;" data-i18n="navClock">The Clock</a>
+      <a href="#events" data-navlink style="color:#c5d2bd; text-decoration:none;" data-i18n="navEvents">Events</a>
+      <a href="#celebi" data-navlink style="color:#c5d2bd; text-decoration:none;">Celebi</a>
       <button type="button" onclick="toggleLang()" id="langBtn" title="Português / English" style="font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:.5px; color:#cfe6a8; background:rgba(20,38,28,.6); border:1px solid rgba(142,198,63,.4); border-radius:9px; padding:10px 11px; cursor:pointer;">PT</button>
       <a href="https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:10px; background:#8ec63f; color:#10261a; font-weight:600; text-decoration:none; box-shadow:0 4px 14px rgba(142,198,63,.3);">GitHub ↗</a>
     </div>
@@ -81,7 +96,7 @@
     <!-- light rays -->
     <div style="position:absolute; top:-10%; left:30%; width:60%; height:120%; background:linear-gradient(115deg, rgba(213,228,202,.16) 0%, rgba(213,228,202,0) 40%); transform:rotate(8deg); animation:raysSweep 7s ease-in-out infinite; pointer-events:none;"></div>
 
-    <div style="position:relative; width:100%; max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1.4fr .9fr; gap:40px; align-items:center;">
+    <div data-hero-grid style="position:relative; width:100%; max-width:1240px; margin:0 auto; display:grid; grid-template-columns:1.4fr .9fr; gap:40px; align-items:center;">
       <div>
         <div style="display:inline-flex; align-items:center; gap:10px; padding:7px 14px; border:1px solid rgba(142,198,63,.45); border-radius:999px; background:rgba(20,38,28,.55); font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:.5px; color:#b6d98f;">
           <span style="width:7px; height:7px; border-radius:50%; background:#8ec63f; box-shadow:0 0 8px #8ec63f;"></span>
@@ -113,7 +128,7 @@
       <div style="justify-self:center; position:relative;">
         <div style="position:absolute; inset:-14% -10%; background:radial-gradient(circle, rgba(142,198,63,.3), transparent 65%); filter:blur(8px);"></div>
         <div style="position:relative; transform:rotate(3deg); border-radius:16px; overflow:hidden; box-shadow:0 30px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.1); animation:bobSlow 9s ease-in-out infinite;">
-          <img src="assets/celebi-suicune-card.png" alt="Celebi &amp; Suicune carddass card" style="display:block; width:300px; max-width:40vw; height:auto;">
+          <img src="assets/celebi-suicune-card.png" alt="Celebi &amp; Suicune carddass card" data-hero-card style="display:block; width:300px; max-width:40vw; height:auto;">
         </div>
       </div>
     </div>
@@ -175,7 +190,7 @@
       </div>
 
       <!-- the fix -->
-      <div style="margin-top:42px; display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+      <div data-grid2 style="margin-top:42px; display:grid; grid-template-columns:1fr 1fr; gap:18px;">
         <div style="padding:28px; border-radius:16px; background:#1a2d22; border:1px solid rgba(142,198,63,.25);">
           <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="fixLabel">THE FIX</div>
           <h3 style="font-size:22px; margin:14px 0 10px; color:#f1f6ea;" data-i18n="fixTitle">Ship as MBC5</h3>
@@ -363,7 +378,7 @@
       <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="celH2">The Celebi cameo</h2>
       <p style="max-width:740px; font-size:17px; line-height:1.65; color:#c4d1bc; margin-top:18px;" data-i18n="celIntro">A version about <em style="color:#e7eee2;">controlling time</em> deserves a nod to the one Pokémon who travels through it. Timeless tucks a shimmering green visitor into two quiet moments, a little reward for paying attention.</p>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:44px;">
+      <div data-grid2 style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:44px;">
         <!-- title screen cameo -->
         <div style="border-radius:18px; overflow:hidden; background:#10241a; border:1.5px solid #8ec63f; box-shadow:0 0 18px rgba(142,198,63,.55), 0 0 44px rgba(142,198,63,.25), 0 20px 50px rgba(0,0,0,.45);">
           <div style="position:relative; height:240px; background:linear-gradient(180deg,#0a1830 0%, #123a52 55%, #1f6b6b 100%); overflow:hidden;">
@@ -437,7 +452,7 @@
       </div>
       <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bdH2">Build it &amp; verify the cart</h2>
 
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:38px; align-items:start;">
+      <div data-grid2 style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:38px; align-items:start;">
         <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
           <h3 style="font-size:18px; margin:0 0 14px; color:#f1f6ea;" data-i18n="bdLeftH3">Build with RGBDS 0.5.2</h3>
           <div style="font-family:'Space Grotesk',monospace; font-size:13.5px; background:#0a1510; border:1px solid rgba(142,198,63,.16); border-radius:10px; padding:16px 18px; color:#cfe6a8; line-height:1.9;">
@@ -469,7 +484,7 @@
   <!-- ================= FOOTER ================= -->
   <footer style="background:#0a140f; padding:64px 28px 40px; border-top:1px solid rgba(142,198,63,.14);">
     <div style="max-width:1100px; margin:0 auto;">
-      <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:36px;">
+      <div data-footer-grid style="display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:36px;">
         <div>
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:44px; height:38px; background-image:url('assets/celebi_final.png'); background-size:contain; background-repeat:no-repeat; background-position:center; image-rendering:pixelated; filter:drop-shadow(0 0 5px rgba(142,198,63,.95)) drop-shadow(0 0 12px rgba(142,198,63,.6));"></div>
