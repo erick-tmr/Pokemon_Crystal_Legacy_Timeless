@@ -7,7 +7,8 @@
 NewBarkTown_MapScripts:
 	def_scene_scripts
 	scene_script .DummyScene0 ; SCENE_NEWBARKTOWN_NOTHING
-	scene_script .DummyScene1 ; SCENE_NEWBARKTOWN_MEET_CELEBI
+	scene_script .DummyScene1 ; SCENE_NEWBARKTOWN_FINISHED
+	scene_script .DummyScene2 ; SCENE_NEWBARKTOWN_MEET_CELEBI
 
 	def_callbacks
 	callback MAPCALLBACK_NEWMAP, .FlyPoint
@@ -17,6 +18,9 @@ NewBarkTown_MapScripts:
 	end
 
 .DummyScene1:
+	end
+
+.DummyScene2:
 	end
 
 .FlyPoint:
@@ -29,6 +33,19 @@ NewBarkTown_MapScripts:
 ; covers save files made before the cutscene existed, where its flag is clear.
 .HideCelebi:
 	setevent EVENT_NEW_BARK_TOWN_CELEBI
+; Self-heal: a trainer who already owns a starter must never sit in the
+; teacher-guard NOTHING scene. v1.1.0 shipped SCENE_NEWBARKTOWN_MEET_CELEBI on
+; the same value as the old SCENE_FINISHED, so finished/upgraded saves could
+; replay the Celebi scene, which then reset New Bark to NOTHING and re-armed the
+; "you can't leave without a #MON" exit guard. Promote any such stranded save
+; to FINISHED so the guard can't reappear. (Pending Celebi sits on MEET_CELEBI,
+; so this never cancels a legitimately armed cutscene.)
+	checkevent EVENT_GOT_A_POKEMON_FROM_ELM
+	iffalse .CelebiHidden
+	checkmapscene NEW_BARK_TOWN
+	ifnotequal SCENE_NEWBARKTOWN_NOTHING, .CelebiHidden
+	setmapscene NEW_BARK_TOWN, SCENE_NEWBARKTOWN_FINISHED
+.CelebiHidden:
 	endcallback
 
 NewBarkTown_TeacherStopsYouScene1:
@@ -172,6 +189,10 @@ NewBarkTownCelebiScene:
 	applymovement NEWBARKTOWN_CELEBI, NewBarkTown_CelebiTeleportsAwayMovement
 	disappear NEWBARKTOWN_CELEBI
 	waitsfx
+; Celebi is armed by Mom's opening Pokegear scene, so it plays BEFORE you walk to
+; Elm's Lab for a starter. Drop back to NOTHING so the teacher keeps guarding the
+; exits until ElmsLab promotes the scene to FINISHED -- do NOT set FINISHED here,
+; or a starterless player could leave town straight after the cutscene.
 	setscene SCENE_NEWBARKTOWN_NOTHING
 	special RestartMapMusic
 	end
@@ -422,8 +443,8 @@ NewBarkTown_MapEvents:
 	warp_event 11, 13, ELMS_HOUSE, 1
 
 	def_coord_events
-	coord_event  1,  8, SCENE_DEFAULT, NewBarkTown_TeacherStopsYouScene1
-	coord_event  1,  9, SCENE_DEFAULT, NewBarkTown_TeacherStopsYouScene2
+	coord_event  1,  8, SCENE_NEWBARKTOWN_NOTHING, NewBarkTown_TeacherStopsYouScene1
+	coord_event  1,  9, SCENE_NEWBARKTOWN_NOTHING, NewBarkTown_TeacherStopsYouScene2
 	coord_event 13,  6, SCENE_NEWBARKTOWN_MEET_CELEBI, NewBarkTownCelebiScene
 
 	def_bg_events

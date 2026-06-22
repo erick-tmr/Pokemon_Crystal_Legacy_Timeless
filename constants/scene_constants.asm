@@ -11,9 +11,14 @@ SCENE_FINISHED EQU 1
 SCENE_ALWAYS   EQU -1
 
 ; wNewBarkTownSceneID
+; NOTHING (0) keeps the teacher guarding the town exits during the pre-starter
+; intro; ElmsLab promotes it to FINISHED (1) once you receive a Pokemon. The
+; Celebi cutscene MUST live on its own value -- it used to share FINISHED's 1,
+; so every finished/upgraded save (and ElmsLab itself) read as "Celebi armed".
 	const_def
 	const SCENE_NEWBARKTOWN_NOTHING     ; 0
-	const SCENE_NEWBARKTOWN_MEET_CELEBI ; 1
+	const SCENE_NEWBARKTOWN_FINISHED    ; 1
+	const SCENE_NEWBARKTOWN_MEET_CELEBI ; 2
 
 ; wPokecenter2FSceneID
 	const_def 1
