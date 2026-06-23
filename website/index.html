@@ -110,7 +110,7 @@
           <span style="height:1px; flex:1; max-width:220px; background:linear-gradient(90deg,#8ec63f,transparent);"></span>
         </div>
 
-        <p style="max-width:540px; margin:26px 0 0; font-size:18px; line-height:1.6; color:#cdd8c5;" data-i18n="heroTag">Gotta catch even more, <strong style="color:#f1f6ea;">now without a clock.</strong> A fork of Crystal Legacy that rips out every Real-Time Clock dependency and ships as an <strong style="color:#b6d98f;">MBC5</strong> cart, so it runs safely on flash carts, FPGA cores and emulators, <em style="color:#e7eee2;">without corrupting your save.</em></p>
+        <p style="max-width:540px; margin:26px 0 0; font-size:18px; line-height:1.6; color:#cdd8c5;" data-i18n="heroTag">Gotta catch even more, <strong style="color:#f1f6ea;">now without a clock.</strong> A fork of Crystal Legacy that fixes the notorious bug where playing on a flash cartridge could quietly erase your saved Pokémon. Your save stays safe, day and night still work, and time is finally yours to set. <em style="color:#7e9080; font-style:normal;">(RIP, RTC.)</em></p>
 
         <div style="display:flex; flex-wrap:wrap; gap:14px; margin-top:32px;">
           <a href="https://github.com/erick-tmr/Pokemon_Crystal_Legacy_Timeless/releases/latest" style="display:inline-flex; align-items:center; gap:10px; padding:15px 26px; border-radius:12px; background:#8ec63f; color:#10261a; font-weight:700; font-size:16px; text-decoration:none; box-shadow:0 10px 30px rgba(142,198,63,.32);" data-i18n="btnDownload">▶ Download the patch</a>
@@ -138,7 +138,7 @@
   <section style="background:linear-gradient(180deg,#0f1c16, #122218); padding:70px 28px; border-top:1px solid rgba(142,198,63,.12);">
     <div style="max-width:1000px; margin:0 auto; text-align:center;">
       <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:#7e9a4f; letter-spacing:1px;" data-i18n="introEyebrow">A CRYSTAL LEGACY FORK</div>
-      <p style="font-size:clamp(22px,2.8vw,32px); line-height:1.45; font-weight:300; color:#e7eee2; margin:20px auto 0; max-width:880px; text-wrap:pretty;" data-i18n="introPara">Original Crystal tells time with a battery-backed clock chip. On hardware that doesn't have one, those clock reads quietly <strong style="font-weight:600; color:#f1f6ea;">scribble over your saved Pokémon.</strong> Timeless removes the clock entirely and hands time back to <strong style="font-weight:600; color:#8ec63f;">you</strong>.</p>
+      <p style="font-size:clamp(22px,2.8vw,32px); line-height:1.45; font-weight:300; color:#e7eee2; margin:20px auto 0; max-width:880px; text-wrap:pretty;" data-i18n="introPara">Original Crystal tells time with a battery-backed clock chip built into the cartridge. On a flash cartridge that doesn't have one, those clock reads quietly <strong style="font-weight:600; color:#f1f6ea;">scribble over your saved Pokémon.</strong> Timeless removes the clock entirely and hands time back to <strong style="font-weight:600; color:#8ec63f;">you</strong>.</p>
       <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:14px; margin-top:36px;">
         <div style="padding:18px 24px; border-radius:14px; background:rgba(20,38,28,.55); border:1px solid rgba(142,198,63,.16); min-width:180px;">
           <div style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:30px; color:#8ec63f;">0</div>
@@ -164,9 +164,25 @@
         <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#cf6b52; letter-spacing:1px;" data-i18n="bugEyebrow">WHY THIS FORK EXISTS</span>
       </div>
       <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bugH2">The clock that ate Box 8</h2>
-      <p style="max-width:720px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="bugIntro">Original Crystal uses an <strong style="color:#e7eee2;">MBC3</strong> mapper with a battery-backed Real-Time Clock. The game tells time by talking to that chip. On hardware <strong style="color:#e7eee2;">without a real RTC</strong>, those conversations don't return garbage. They silently overwrite your <strong style="color:#e89a86;">saved game</strong>.</p>
+      <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="bugIntro">Here's the short version. The original game keeps time with a tiny <strong style="color:#e7eee2;">clock chip</strong> built right into the cartridge. An emulator recreates that chip in software, so it's fine. But some <strong style="color:#e7eee2;">flash cartridges and reproduction carts</strong>, a common way to play a fan patch on real hardware, leave that chip out. So when the game tries to ask the clock what time it is, it ends up writing its time data <strong style="color:#e89a86;">on top of your saved Pokémon</strong> instead.</p>
+      <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:14px;" data-i18n="bugIntro2">That's where the two infamous bugs come from: <strong style="color:#e89a86;">Box 8 keeps getting wiped</strong>, and <strong style="color:#e89a86;">the in-game clock jumps around on its own</strong> as you play.</p>
 
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-top:42px;">
+      <!-- plain-English fix -->
+      <div style="display:flex; align-items:flex-start; gap:16px; margin-top:30px; padding:22px 24px; border-radius:14px; background:rgba(142,198,63,.1); border:1px solid rgba(142,198,63,.3);">
+        <p style="margin:0; font-size:15.5px; line-height:1.65; color:#cfe0c4;" data-i18n="bugPlainFix"><strong style="color:#eaf3d8;">The fix, in plain English:</strong> this fork ships the game on a different, clock-free cartridge type, so there's simply no clock left to break. Your existing save still works, nothing about your Pokémon or boxes changes, and the corruption can never happen again.</p>
+      </div>
+
+      <!-- nerdy / in-depth -->
+      <details style="margin-top:32px; border:1px solid rgba(180,69,47,.28); border-radius:16px; background:#0f1c16; overflow:hidden;">
+        <summary style="cursor:pointer; display:flex; flex-wrap:wrap; align-items:center; gap:12px; user-select:none; padding:20px 24px;">
+          <span class="spoilerChev" style="font-size:11px; color:#cf6b52;">▶</span>
+          <span style="font-family:'Press Start 2P',monospace; font-size:10px; letter-spacing:.5px; color:#cf6b52;">NERDY EXPLANATION</span>
+          <span data-i18n="bugNerdyHint" style="font-size:13px; color:#7e9080;">the register-level story · in depth</span>
+        </summary>
+        <div style="padding:4px 24px 26px;">
+      <p style="max-width:720px; font-size:15.5px; line-height:1.65; color:#c0cdb8; margin:0;" data-i18n="bugTech">Original Crystal uses an <strong style="color:#e7eee2;">MBC3</strong> mapper with a battery-backed Real-Time Clock. The game tells time by talking to that chip. On a flash cart <strong style="color:#e7eee2;">with no real RTC</strong>, those conversations don't return garbage. They silently overwrite your <strong style="color:#e89a86;">saved game</strong>.</p>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-top:24px;">
         <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(180,69,47,.28);">
           <div style="font-family:'Press Start 2P',monospace; font-size:11px; color:#cf6b52;">01</div>
           <h3 style="font-size:19px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="bugC1T">A register doing double duty</h3>
@@ -211,6 +227,61 @@
             <span style="font-family:'Press Start 2P',monospace; font-size:11px; color:#6f8167; width:96px;" data-i18n="hwLabel">HARDWARE</span>
             <span style="font-size:15px; color:#e7eee2;" data-i18n="hwVal">Flash carts, FPGA cores &amp; emulators, all verified solid.</span>
           </div>
+        </div>
+      </div>
+        </div>
+      </details>
+
+      <!-- ========== PART 2: more than a bugfix ========== -->
+      <div style="margin-top:64px; padding-top:52px; border-top:1px solid rgba(142,198,63,.16);">
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
+          <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
+          <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="perkEyebrow">MORE THAN A BUGFIX</span>
+        </div>
+        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4.2vw,48px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="perkH2">Time on your terms</h2>
+        <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="perkIntro">Even on an emulator or an RTC flash cart, where your save was always safe, this is the version to play. Pulling the clock out didn't just stop the corruption. It reshaped Crystal around the way people actually play today, starting with the one thing every fan wishes the originals had.</p>
+
+        <!-- main appeal: Celebi's blessing -->
+        <div style="margin-top:34px; display:flex; flex-wrap:wrap; gap:42px; align-items:center; padding:38px; border-radius:22px; background:radial-gradient(130% 150% at 14% 28%, rgba(142,198,63,.15), rgba(20,38,28,.5) 58%); border:1px solid rgba(142,198,63,.28);">
+          <figure style="margin:0; flex:none; display:flex; flex-direction:column; align-items:center; gap:12px;">
+            <img loading="lazy" src="assets/celebi-card.png" alt="Celebi · Leap Through Time" style="width:228px; max-width:60vw; display:block; filter:drop-shadow(0 20px 40px rgba(142,198,63,.22)) drop-shadow(0 8px 22px rgba(0,0,0,.5));">
+            <figcaption style="font-family:'Press Start 2P',monospace; font-size:8px; line-height:1.4; letter-spacing:.5px; color:#7e9a4f; text-align:center;" data-i18n="blessCardCap">CELEBI · LEAP THROUGH TIME</figcaption>
+          </figure>
+          <div style="flex:1; min-width:300px;">
+            <div style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="blessEyebrow">CELEBI'S BLESSING</div>
+            <h3 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(25px,3.1vw,36px); margin:14px 0 0; letter-spacing:-.5px; color:#f1f6ea;" data-i18n="blessH3">Change the time anywhere, mid-game</h3>
+            <p style="font-size:15.5px; line-height:1.65; color:#c0cdb8; margin:16px 0 0;" data-i18n="blessBody">You don't have limitless hours to wait for in-game days to roll over. Maybe you only get one hour to play, and it happens to be the middle of the night. That shouldn't keep you from harvesting berries, evolving Eevee, or grooming a baby Pokémon to full happiness. Celebi's gift is command over time itself: open the <strong style="color:#cfe6a8;">Pokégear Clock</strong> and set the time right where you stand, no restarting, no trip back to the title screen. The game finally bends to your schedule, the way a modern Pokémon game should.</p>
+            <div style="display:inline-flex; align-items:center; gap:9px; margin-top:20px; padding:10px 15px; border-radius:10px; background:rgba(142,198,63,.12); border:1px solid rgba(142,198,63,.32); font-family:'Press Start 2P',monospace; font-size:9px; letter-spacing:.5px; color:#cfe6a8;" data-i18n="blessHow">POKÉGEAR › CLOCK › HOLD SELECT + UP</div>
+          </div>
+        </div>
+
+        <div style="margin-top:54px;">
+          <h3 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(22px,2.6vw,30px); margin:0; color:#f1f6ea; letter-spacing:-.5px;" data-i18n="perkGridH3">And the daily grind? Ungated.</h3>
+          <p style="max-width:720px; font-size:15.5px; line-height:1.6; color:#9fb09a; margin:12px 0 0;" data-i18n="perkGridSub">With time in your hands, a whole class of once-a-day rewards lost their daily cap. Run them back to back, no clock-watching, no sleeping on it.</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:18px; margin-top:26px;">
+            <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+              <div style="font-size:28px;">🫐</div>
+              <h3 style="font-size:18px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="perk1T">Berries on tap</h3>
+              <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="perk1B">Berry trees refill every single time instead of once a day. Endless healing items and held berries, harvested as fast as you can walk the loop.</p>
+            </div>
+            <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+              <div style="font-size:28px;">✂️</div>
+              <h3 style="font-size:18px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="perk2T">Grooming &amp; happiness</h3>
+              <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="perk2B">Visit the Goldenrod haircut brothers as often as you want to pump friendship. Evolve happiness Pokémon on the spot, baby mons like Pichu and Cleffa, and Eevee into <strong style="color:#cfe6a8;">Espeon or Umbreon</strong>.</p>
+            </div>
+            <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+              <div style="font-size:28px;">📻</div>
+              <h3 style="font-size:18px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="perk3T">Radio Card points</h3>
+              <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="perk3B">Buena's Password pays out every visit with no daily cap, so Blue Card points and their prizes pile up in minutes instead of weeks.</p>
+            </div>
+            <div style="padding:26px; border-radius:16px; background:#16271e; border:1px solid rgba(142,198,63,.18);">
+              <div style="font-size:28px;">💰</div>
+              <h3 style="font-size:18px; margin:14px 0 8px; color:#f1f6ea;" data-i18n="perk4T">The Goldenrod money trick</h3>
+              <p style="font-size:14.5px; line-height:1.6; color:#a9b8a2; margin:0;" data-i18n="perk4B">The once-a-day payout is now repeatable. Run it as many times as you like for quick, reliable cash, no day-skipping required.</p>
+            </div>
+          </div>
+
+          <p style="font-size:14.5px; line-height:1.6; color:#9fb09a; margin:20px 0 0; max-width:760px;" data-i18n="perkMore">...and plenty more, from the Move Tutor to the Trainer House. <a href="#events" style="color:#cfe6a8; text-decoration:none; border-bottom:1px solid rgba(207,230,168,.4);">See the full list of what changed →</a></p>
         </div>
       </div>
     </div>
@@ -538,17 +609,21 @@
     navClock: `O Relógio`,
     navEvents: `Eventos`,
     heroVersion: `VERSÃO`,
-    heroTag: `Capture ainda mais, <strong style="color:#f1f6ea;">agora sem relógio.</strong> Um fork de Crystal Legacy que remove toda dependência do Real-Time Clock e roda como cartucho <strong style="color:#b6d98f;">MBC5</strong>, funcionando com segurança em flash carts, núcleos FPGA e emuladores, <em style="color:#e7eee2;">sem corromper o seu save.</em>`,
+    heroTag: `Capture ainda mais, <strong style="color:#f1f6ea;">agora sem relógio.</strong> Um fork de Crystal Legacy que corrige o famoso bug em que jogar num flash cartridge podia apagar silenciosamente os seus Pokémon salvos. Seu save fica seguro, dia e noite continuam funcionando, e o tempo finalmente é seu para ajustar. <em style="color:#7e9080; font-style:normal;">(RIP, RTC.)</em>`,
     btnDownload: `▶ Baixar o patch`,
     btnWhy: `Porque o patch existe →`,
     introEyebrow: `UM FORK DE CRYSTAL LEGACY`,
-    introPara: `O Crystal original marca o tempo com um chip de relógio com bateria. Em hardware que não tem um, essas leituras silenciosamente <strong style="font-weight:600; color:#f1f6ea;">sobrescrevem os seus Pokémon salvos.</strong> A Timeless remove o relógio por completo e devolve o tempo às <strong style="font-weight:600; color:#8ec63f;">suas mãos</strong>.`,
+    introPara: `O Crystal original marca o tempo com um chip de relógio com bateria embutido no cartucho. Num flash cartridge que não tem um, essas leituras silenciosamente <strong style="font-weight:600; color:#f1f6ea;">sobrescrevem os seus Pokémon salvos.</strong> A Timeless remove o relógio por completo e devolve o tempo às <strong style="font-weight:600; color:#8ec63f;">suas mãos</strong>.`,
     stat1: `Leituras e escritas no RTC`,
     stat2: `Formato do save intacto`,
     stat3: `Controle sobre o tempo`,
     bugEyebrow: `POR QUE ESTE FORK EXISTE`,
     bugH2: `O relógio que devorou a Box 8`,
-    bugIntro: `O Crystal original usa um mapeador <strong style="color:#e7eee2;">MBC3</strong> com um Real-Time Clock alimentado por bateria. O jogo marca o tempo conversando com esse chip. Em hardware <strong style="color:#e7eee2;">sem um RTC de verdade</strong>, essas conversas não devolvem lixo. Elas silenciosamente sobrescrevem o seu <strong style="color:#e89a86;">jogo salvo</strong>.`,
+    bugIntro: `Resumindo: o jogo original marca o tempo com um pequeno <strong style="color:#e7eee2;">chip de relógio</strong> embutido no cartucho. Um emulador recria esse chip em software, então funciona bem. Mas alguns <strong style="color:#e7eee2;">flash cartridges e cartuchos de reprodução</strong>, uma forma comum de jogar um patch de fã em hardware real, não incluem esse chip. Então, quando o jogo tenta perguntar a hora ao relógio, ele acaba gravando os dados de tempo <strong style="color:#e89a86;">por cima dos seus Pokémon salvos</strong>.`,
+    bugIntro2: `É daí que vêm os dois bugs famosos: <strong style="color:#e89a86;">a Box 8 vive sendo apagada</strong> e <strong style="color:#e89a86;">o relógio do jogo muda sozinho</strong> enquanto você joga.`,
+    bugPlainFix: `<strong style="color:#eaf3d8;">A correção, em bom português:</strong> este fork publica o jogo num tipo de cartucho sem relógio, então simplesmente não sobra relógio para quebrar. Seu save existente continua funcionando, nada muda nos seus Pokémon ou boxes, e a corrupção nunca mais pode acontecer.`,
+    bugNerdyHint: `a história nível-registrador · em detalhe`,
+    bugTech: `O Crystal original usa um mapeador <strong style="color:#e7eee2;">MBC3</strong> com um Real-Time Clock alimentado por bateria. O jogo marca o tempo conversando com esse chip. Num flash cart <strong style="color:#e7eee2;">sem um RTC de verdade</strong>, essas conversas não devolvem lixo. Elas silenciosamente sobrescrevem o seu <strong style="color:#e89a86;">jogo salvo</strong>.`,
     bugC1T: `Um registrador com função dupla`,
     bugC1B: `No MBC3, escrever em <code style="font-family:'Space Grotesk',monospace; color:#e6c07a;">$4000</code> seleciona um banco de SRAM (<code style="color:#e6c07a;">$00–$03</code>) <em>ou</em> um registrador do RTC (<code style="color:#e6c07a;">$08–$0C</code>). Mesmo endereço, dois papéis.`,
     bugC2T: `Sem relógio, sem modo de relógio`,
@@ -565,6 +640,25 @@
     yourSavVal: `Saves existentes funcionam como estão. Sem patch de bytes.`,
     hwLabel: `HARDWARE`,
     hwVal: `Flash carts, núcleos FPGA &amp; emuladores, todos verificados.`,
+    perkEyebrow: `MAIS QUE UM CONSERTO`,
+    perkH2: `O tempo nas suas mãos`,
+    perkIntro: `Mesmo num emulador ou num flash cart com RTC, onde o seu save sempre esteve seguro, esta é a versão para jogar. Tirar o relógio não só impediu a corrupção. Remodelou o Crystal em torno do jeito que as pessoas realmente jogam hoje, a começar pela única coisa que todo fã queria nos originais.`,
+    blessEyebrow: `A BÊNÇÃO DO CELEBI`,
+    blessH3: `Mude a hora onde quiser, no meio do jogo`,
+    blessBody: `Você não tem horas infinitas para esperar os dias do jogo virarem. Às vezes só dá pra jogar uma hora, e calha de ser de madrugada. Isso não devia te impedir de colher berries, evoluir o Eevee ou deixar um bebê feliz o bastante para evoluir. O presente do Celebi é o domínio sobre o próprio tempo: abra o <strong style="color:#cfe6a8;">Relógio do Pokégear</strong> e ajuste a hora ali mesmo, sem reiniciar, sem voltar para a tela de título. O jogo finalmente se adapta à sua rotina, como um Pokémon moderno faria.`,
+    blessCardCap: `CELEBI · LEAP THROUGH TIME`,
+    blessHow: `POKÉGEAR › RELÓGIO › SEGURE SELECT + CIMA`,
+    perkGridH3: `E a rotina diária? Sem trava.`,
+    perkGridSub: `Com o tempo nas suas mãos, uma categoria inteira de recompensas de uma vez por dia perdeu o limite diário. Repita uma atrás da outra, sem olhar o relógio, sem dormir para esperar.`,
+    perk1T: `Berries à vontade`,
+    perk1B: `As árvores de berry reabastecem toda vez, não uma vez por dia. Itens de cura e berries de segurar infinitos, colhidos na velocidade que você fizer a volta.`,
+    perk2T: `Tosa &amp; felicidade`,
+    perk2B: `Visite os irmãos do corte de cabelo de Goldenrod quantas vezes quiser para subir a felicidade. Evolua Pokémon de amizade na hora: bebês como Pichu e Cleffa, e o Eevee em <strong style="color:#cfe6a8;">Espeon ou Umbreon</strong>.`,
+    perk3T: `Pontos do Radio Card`,
+    perk3B: `A senha da Buena paga a cada visita, sem limite diário, então os pontos do Blue Card e seus prêmios acumulam em minutos, não em semanas.`,
+    perk4T: `O truque de dinheiro de Goldenrod`,
+    perk4B: `O pagamento de uma vez por dia agora é repetível. Repita quantas vezes quiser para uma grana rápida e garantida, sem precisar pular dias.`,
+    perkMore: `...e muito mais, do Move Tutor à Casa de Treinadores. <a href="#events" style="color:#cfe6a8; text-decoration:none; border-bottom:1px solid rgba(207,230,168,.4);">Veja a lista completa do que mudou →</a>`,
     clockEyebrow: `CONTROLE O TEMPO VOCÊ MESMO`,
     clockH2: `Um relógio congelado sob seu controle`,
     clockIntro: `Sem o RTC, o tempo é um <strong style="color:#e7eee2;">valor de software que você define</strong> e que nunca avança sozinho. Coloque o tempo à noite e <em>grinde</em> por uma hora: continua noite. As paletas de dia e noite permanecem funcionando perfeitamente.`,
@@ -572,8 +666,6 @@
     todBody: `Manhã / Dia / Noite. Define encontros selvagens &amp; paletas, e NPCs travados por horário, como a Daisy às 15h, a Buena à noite e a loja de ofertas pela manhã.`,
     wdTitle: `Dia da semana`,
     wdBody: `Seg–Dom. Define todo evento travado por dia da semana, da Lapras na sexta à promoção da cobertura, os NPCs irmãos semanais e qual irmão do corte de cabelo está.`,
-    dcTitle: `Contador de dias`,
-    dcBody: `Avance o dia para disparar o reset diário, renovando todos os eventos diários de uma vez. O jeito mais fácil de “esperar um dia” de qualquer lugar.`,
     entryH3: `Três formas de abrir a tela do relógio`,
     entrySub: `As três gravam os mesmos offsets, então use a que for mais conveniente.`,
     optAName: `Novo Jogo`,
