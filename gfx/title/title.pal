@@ -45,11 +45,11 @@
 	RGB 17, 05, 22
 	RGB 19, 09, 31
 
-; OBJ palette 1: Celebi (transparent, light green, dark green outline, white eye)
+; OBJ palette 1: Celebi (transparent, dark green body, darker green outline, light blue eye)
 	RGB 31, 31, 31
-	RGB 22, 31, 17
 	RGB 05, 13, 04
-	RGB 31, 31, 31
+	RGB 02, 06, 02
+	RGB 15, 23, 31
 
 	RGB 31, 31, 31
 	RGB 00, 00, 00
