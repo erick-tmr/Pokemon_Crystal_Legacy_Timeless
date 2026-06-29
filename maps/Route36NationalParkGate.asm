@@ -146,7 +146,16 @@ Route36OfficerScriptContest:
 	ifequal FRIDAY, _ContestNotOn
 	faceplayer
 	opentext
-	checkflag ENGINE_DAILY_BUG_CONTEST
+	; No RTC: the contest no longer sets a "concluded today" flag, so hand back any
+	; prize held from an earlier full-bag win (by checking the held-prize events
+	; directly) before offering the contest again.
+	checkevent EVENT_CONTEST_OFFICER_HAS_SUN_STONE
+	iftrue Route36Officer_ContestHasConcluded
+	checkevent EVENT_CONTEST_OFFICER_HAS_EVERSTONE
+	iftrue Route36Officer_ContestHasConcluded
+	checkevent EVENT_CONTEST_OFFICER_HAS_GOLD_BERRY
+	iftrue Route36Officer_ContestHasConcluded
+	checkevent EVENT_CONTEST_OFFICER_HAS_BERRY
 	iftrue Route36Officer_ContestHasConcluded
 	scall Route36ParkGate_DayToText
 	writetext Route36NationalParkGateOfficer1AskToParticipateText
@@ -292,7 +301,15 @@ _ContestNotOn:
 Route36NationalParkGateOfficerScript:
 	faceplayer
 	opentext
-	checkflag ENGINE_DAILY_BUG_CONTEST
+	; No RTC: the contest no longer sets a "concluded today" flag, so hand back any
+	; prize held from a full-bag win by checking the held-prize events directly.
+	checkevent EVENT_CONTEST_OFFICER_HAS_SUN_STONE
+	iftrue Route36Officer_ContestHasConcluded
+	checkevent EVENT_CONTEST_OFFICER_HAS_EVERSTONE
+	iftrue Route36Officer_ContestHasConcluded
+	checkevent EVENT_CONTEST_OFFICER_HAS_GOLD_BERRY
+	iftrue Route36Officer_ContestHasConcluded
+	checkevent EVENT_CONTEST_OFFICER_HAS_BERRY
 	iftrue Route36Officer_ContestHasConcluded
 	writetext Route36NationalParkGateOfficer1SomeMonOnlySeenInParkText
 	waitbutton
