@@ -406,7 +406,9 @@ BugContestResults_CleanUp:
 	setevent EVENT_BUG_CATCHING_CONTESTANT_8B
 	setevent EVENT_BUG_CATCHING_CONTESTANT_9B
 	setevent EVENT_BUG_CATCHING_CONTESTANT_10B
-	setflag ENGINE_DAILY_BUG_CONTEST
+	; No RTC: don't record the once-per-day flag, so the Bug Contest can be entered
+	; again without advancing the clock (it's still Tue/Thu/Sat via the gate maps).
+	; setflag ENGINE_DAILY_BUG_CONTEST
 	special PlayMapMusic
 	end
 
