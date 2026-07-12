@@ -52,6 +52,35 @@
     [data-hero-grid], [data-grid2], [data-footer-grid] { grid-template-columns: 1fr !important; gap: 28px !important; }
     [data-hero-card] { max-width: 70vw !important; }
   }
+
+  /* ---------- section permalinks ---------- */
+  .secHead { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; }
+  .permalink {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    line-height: 1;
+    color: #8ec63f;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity .18s ease, transform .18s ease;
+    cursor: pointer;
+  }
+  .secHead:hover .permalink { opacity: .6; }
+  .permalink:hover, .permalink:focus-visible { opacity: 1; transform: translateY(-1px); outline: none; }
+  @media (hover: none) { .permalink { opacity: .4; } }
+
+  .copyToast {
+    position: fixed; left: 50%; bottom: 28px;
+    transform: translateX(-50%) translateY(12px);
+    z-index: 200;
+    padding: 11px 18px; border-radius: 12px;
+    background: rgba(20,38,28,.96); border: 1px solid rgba(142,198,63,.5);
+    color: #eaf3d8; font-family: 'Press Start 2P', monospace; font-size: 10px; letter-spacing: .5px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.5);
+    opacity: 0; pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease;
+  }
+  .copyToast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -163,7 +192,7 @@
         <span style="width:34px; height:3px; background:#b4452f; border-radius:2px;"></span>
         <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#cf6b52; letter-spacing:1px;" data-i18n="bugEyebrow">WHY THIS FORK EXISTS</span>
       </div>
-      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bugH2">The clock that ate Box 8</h2>
+      <h2 data-anchor="bug" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bugH2">The clock that ate Box 8</h2>
       <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="bugIntro">Here's the short version. The original game keeps time with a tiny <strong style="color:#e7eee2;">clock chip</strong> built right into the cartridge. An emulator recreates that chip in software, so it's fine. But some <strong style="color:#e7eee2;">flash cartridges and reproduction carts</strong>, a common way to play a fan patch on real hardware, leave that chip out. So when the game tries to ask the clock what time it is, it ends up writing its time data <strong style="color:#e89a86;">on top of your saved Pokémon</strong> instead.</p>
       <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:14px;" data-i18n="bugIntro2">That's where the two infamous bugs come from: <strong style="color:#e89a86;">Box 8 keeps getting wiped</strong>, and <strong style="color:#e89a86;">the in-game clock jumps around on its own</strong> as you play.</p>
 
@@ -233,12 +262,12 @@
       </details>
 
       <!-- ========== PART 2: more than a bugfix ========== -->
-      <div style="margin-top:64px; padding-top:52px; border-top:1px solid rgba(142,198,63,.16);">
+      <div id="perks" style="margin-top:64px; padding-top:52px; border-top:1px solid rgba(142,198,63,.16); scroll-margin-top:80px;">
         <div style="display:flex; align-items:center; gap:14px; margin-bottom:14px;">
           <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
           <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="perkEyebrow">MORE THAN A BUGFIX</span>
         </div>
-        <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4.2vw,48px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="perkH2">Time on your terms</h2>
+        <h2 data-anchor="perks" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(30px,4.2vw,48px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="perkH2">Time on your terms</h2>
         <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="perkIntro">Even on an emulator or an RTC flash cart, where your save was always safe, this is the version to play. Pulling the clock out didn't just stop the corruption. It reshaped Crystal around the way people actually play today, starting with the one thing every fan wishes the originals had.</p>
 
         <!-- main appeal: Celebi's blessing -->
@@ -294,7 +323,7 @@
         <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
         <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="clockEyebrow">CONTROL TIME YOURSELF</span>
       </div>
-      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="clockH2">A frozen clock you control</h2>
+      <h2 data-anchor="clock" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="clockH2">A frozen clock you control</h2>
       <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="clockIntro">With the RTC gone, time is a <strong style="color:#e7eee2;">software value you set</strong> that never advances on its own. Set it to night and grind for an hour, and it stays night. Day &amp; night palettes are stable. The day counter only moves when <strong style="color:#8ec63f;">you</strong> move it.</p>
 
       <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-top:42px;">
@@ -350,7 +379,7 @@
         <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
         <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="evEyebrow">TIME-BASED EVENTS</span>
       </div>
-      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="evH2">Nothing removed, just driven by you</h2>
+      <h2 data-anchor="events" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="evH2">Nothing removed, just driven by you</h2>
       <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="evIntro">Almost every daily/weekly event keys off the day counter, not the clock chip, so they all still work. They just advance when you move the clock. One category got <strong style="color:#8ec63f;">better</strong>:</p>
 
       <!-- headline: always available -->
@@ -445,7 +474,7 @@
         <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
         <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="celEyebrow">A GUARDIAN OF TIME</span>
       </div>
-      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="celH2">The Celebi cameo</h2>
+      <h2 data-anchor="celebi" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="celH2">The Celebi cameo</h2>
       <p style="max-width:740px; font-size:17px; line-height:1.65; color:#c4d1bc; margin-top:18px;" data-i18n="celIntro">A version about <em style="color:#e7eee2;">controlling time</em> deserves a nod to the one Pokémon who travels through it. Timeless tucks a shimmering green visitor into two quiet moments, a little reward for paying attention.</p>
 
       <div data-grid2 style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:44px;">
@@ -520,7 +549,7 @@
         <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
         <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="bdEyebrow">PATCH IT YOURSELF</span>
       </div>
-      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bdH2">Building the ROM</h2>
+      <h2 data-anchor="download" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="bdH2">Building the ROM</h2>
       <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="bdIntro">Timeless ships as a <strong style="color:#e7eee2;">.bps patch</strong> you apply to your own copy of Crystal. Here's the short version of what you need and how to do it.</p>
 
       <div data-grid2 style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:38px; align-items:start;">
@@ -594,7 +623,7 @@
         <span style="width:34px; height:3px; background:#8ec63f; border-radius:2px;"></span>
         <span style="font-family:'Press Start 2P',monospace; font-size:10px; color:#8ec63f; letter-spacing:1px;" data-i18n="phyEyebrow">MAKE IT REAL</span>
       </div>
-      <h2 style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="phyH2">Build your own physical copy</h2>
+      <h2 data-anchor="physical" style="font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(32px,4.5vw,52px); margin:0; letter-spacing:-1px; color:#f1f6ea;" data-i18n="phyH2">Build your own physical copy</h2>
       <p style="max-width:760px; font-size:17px; line-height:1.65; color:#c0cdb8; margin-top:18px;" data-i18n="phyIntro">If you want to build your own physical copy, we have print-ready artwork for the <strong style="color:#e7eee2;">cartridge label</strong> and the <strong style="color:#e7eee2;">box</strong>. Download the images below and take them to your printer of choice. Prefer to buy one ready-made? Our recommended partner <a href="https://www.prismagames.com.br/" target="_blank" rel="noopener" style="color:#cfe6a8; text-decoration:none; border-bottom:1px solid rgba(207,230,168,.45);">Prisma Games</a>, a Brazilian boutique, sells physical copies and ships worldwide.</p>
 
       <div data-grid2 style="display:grid; grid-template-columns:1fr 1fr; gap:22px; margin-top:40px; align-items:stretch;">
@@ -673,6 +702,8 @@
   var hint = document.getElementById('langHint');
   var lang = 'en';
   var en = {};
+  var permalinks = [];
+  var toast;
 
   // Portuguese strings, ported verbatim from the design.
   const pt = {
@@ -859,6 +890,7 @@
       n.innerHTML = (T && T[k] != null) ? T[k] : en[k];
     });
     if (btn) btn.textContent = lang === 'pt' ? 'EN' : 'PT';
+    permalinkLabels();
   }
 
   window.toggleLang = function () {
@@ -901,9 +933,90 @@
     });
   }
 
+  // Keep the permalink tooltips in the current language.
+  function permalinkLabels() {
+    var label = lang === 'pt' ? 'Copiar link desta seção' : 'Copy link to this section';
+    permalinks.forEach(function (a) { a.title = label; a.setAttribute('aria-label', label); });
+  }
+
+  function showToast(msg) {
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.className = 'copyToast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = msg;
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { toast.classList.remove('show'); }, 1900);
+  }
+
+  function legacyCopy(text) {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(
+        function () { return true; },
+        function () { return legacyCopy(text); }
+      );
+    }
+    return Promise.resolve(legacyCopy(text));
+  }
+
+  // Give each section heading a "#" permalink: click scrolls there, updates the
+  // URL, and copies a shareable link. The anchor lives beside the heading (not
+  // inside it) so the language toggle's innerHTML swaps never clobber it.
+  function wirePermalinks() {
+    if (!root) return;
+    root.querySelectorAll('[data-anchor]').forEach(function (h) {
+      var id = h.getAttribute('data-anchor');
+      var wrap = document.createElement('div');
+      wrap.className = 'secHead';
+      h.parentNode.insertBefore(wrap, h);
+      wrap.appendChild(h);
+
+      var a = document.createElement('a');
+      a.className = 'permalink';
+      a.href = '#' + id;
+      a.textContent = '#';
+      wrap.appendChild(a);
+      permalinks.push(a);
+
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = document.getElementById(id);
+        var url = location.origin + location.pathname + location.search + '#' + id;
+        if (history.pushState) history.pushState(null, '', '#' + id);
+        else location.hash = id;
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        copyText(url).then(function (ok) {
+          showToast(ok
+            ? (lang === 'pt' ? 'Link copiado ✓' : 'Link copied ✓')
+            : (lang === 'pt' ? 'Link na barra de endereço ↑' : 'Link in the address bar ↑'));
+        });
+      });
+    });
+    permalinkLabels();
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     collectEn();
     wireSpoilers();
+    wirePermalinks();
     setTimeout(showLangHint, 1000);
   });
 })();
